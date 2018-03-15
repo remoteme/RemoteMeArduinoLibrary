@@ -12,7 +12,6 @@
 
 
 
-
 	RemoteMe::RemoteMe(char * token, uint16_t deviceId) {
 		this->token = std::move(token);
 		this->deviceId = deviceId;
@@ -45,28 +44,28 @@
 				uint16_t pos = 0;
 				RemoteMe& rm = RemoteMe::getInstance("", 0);
 
-				RemotemeStructures::MessageType messageType = static_cast<RemotemeStructures::MessageType> (RemoteMe::getShort(payload, pos));
-				uint16_t size = RemoteMe::getInstance("", 0).getShort(payload, pos);
+				RemotemeStructures::MessageType messageType = static_cast<RemotemeStructures::MessageType> (RemoteMeMessagesUtils::getShort(payload, pos));
+				uint16_t size = RemoteMeMessagesUtils::getShort(payload, pos);
 				if (messageType == RemotemeStructures::USER_MESSAGE) {
-					RemotemeStructures::WSUserMessageSettings userMessageSettings = static_cast<RemotemeStructures::WSUserMessageSettings>(RemoteMe::getByte(payload, pos));
-					uint16_t receiverDeviceId = RemoteMe::getShort(payload, pos);
-					uint16_t senderDeviceId = RemoteMe::getShort(payload, pos);
-					uint16_t messageId = RemoteMe::getShort(payload, pos);
+					RemotemeStructures::WSUserMessageSettings userMessageSettings = static_cast<RemotemeStructures::WSUserMessageSettings>(RemoteMeMessagesUtils::getByte(payload, pos));
+					uint16_t receiverDeviceId = RemoteMeMessagesUtils::getShort(payload, pos);
+					uint16_t senderDeviceId = RemoteMeMessagesUtils::getShort(payload, pos);
+					uint16_t messageId = RemoteMeMessagesUtils::getShort(payload, pos);
 
 					uint16_t dataSize = size - pos + 4;// -4 2 for suze 2 for bytes becasuse size is without this
-					uint8_t* data = RemoteMe::getArray(payload, pos, dataSize);
+					uint8_t* data = RemoteMeMessagesUtils::getArray(payload, pos, dataSize);
 					if (rm.onUserMessage!=nullptr) {
 						rm.onUserMessage(senderDeviceId,dataSize, data);
 					}
 				}
 				else if (messageType == RemotemeStructures::USER_SYNC_MESSAGE) {
-					uint16_t receiverDeviceId = RemoteMe::getShort(payload, pos);
-					uint16_t senderDeviceId = RemoteMe::getShort(payload, pos);
+					uint16_t receiverDeviceId = RemoteMeMessagesUtils::getShort(payload, pos);
+					uint16_t senderDeviceId = RemoteMeMessagesUtils::getShort(payload, pos);
 
-					uint64_t messageId = RemoteMe::getLong(payload, pos);
+					uint64_t messageId = RemoteMeMessagesUtils::getLong(payload, pos);
 
 					uint16_t dataSize = size - pos + 4;
-					uint8_t* data = RemoteMe::getArray(payload, pos, dataSize);
+					uint8_t* data = RemoteMeMessagesUtils::getArray(payload, pos, dataSize);
 
 
 					if (rm.onUserSyncMessage != nullptr) {
@@ -91,6 +90,27 @@
 
 	}
 
+	
+	String RemoteMe::callRest(String restUrl){
+		HttpClient* httpClient;
+		if (httpClient == nullptr) {
+			WiFiClient wifiClient;
+			httpClient = new HttpClient(wifiClient, HOST, PORT);
+		}
+		
+		httpClient->beginRequest();
+		httpClient->get(restUrl);
+		httpClient->sendHeader("Content-Type", "text/plain");
+		httpClient->sendHeader("Content-Length", 0);
+		httpClient->sendHeader("token", token);
+		httpClient->endRequest();
+
+	
+		int statusCode = httpClient->responseStatusCode();
+		return httpClient->responseBody();
+		
+	}
+	
 	void RemoteMe::sendByRest(uint8_t * payload, size_t length){
 
 		//secure
@@ -158,120 +178,6 @@
 	
 
 
-	void RemoteMe::putString(uint8_t* data, uint16_t &pos, String string) {
-		const uint8_t* dataString = reinterpret_cast<const uint8_t*>(&string[0]);
-		putArray(data, pos, dataString, string.length());
-		data[pos++] = 0;
-
-
-	}
-	void RemoteMe::putArray(uint8_t* data, uint16_t &pos, const void* arrayT, uint16_t length) {
-
-		memcpy(&data[pos], arrayT, length);
-
-		pos += length;
-	}
-
-	void RemoteMe::putByte(uint8_t* data, uint16_t &pos, uint8_t number) {
-		data[pos++] = number;
-
-
-	}
-
-	void RemoteMe::putShort(uint8_t* data, uint16_t &pos, uint16_t number) {
-		putBigEndian(data, pos, &number, sizeof(uint16_t));
-	}
-
-	void RemoteMe::putLong(uint8_t* data, uint16_t &pos, uint64_t number) {
-		putBigEndian(data, pos, &number, sizeof(uint64_t));
-	}
-
-
-	uint8_t* RemoteMe::getReverseBytes(void* start, uint16_t size) {
-		uint8_t* ret = new uint8_t[size];
-
-		for (uint8_t i = 0; i < size; i++) {
-			ret[i] = ((uint8_t*)start)[size - i - 1];
-
-		}
-
-
-		return ret;
-	}
-
-	void RemoteMe::putBigEndian(uint8_t* data, uint16_t &pos, void* value, uint16_t size) {
-		putArray(data, pos, getReverseBytes(value, size), size);
-	}
-
-	void RemoteMe::putDouble(uint8_t* data, uint16_t &pos, double value) {
-		return putBigEndian(data, pos, &value, sizeof(double));
-	}
-
-	uint8_t* RemoteMe::getArray(uint8_t* data, uint16_t& pos, uint16_t length) {
-		if (length != 0) {
-			uint8_t* ret = (uint8_t*)malloc(length);
-			memcpy(ret, &data[pos], length);
-			return ret;
-		}
-		else {
-			return (uint8_t*)malloc(1);
-		};
-
-	}
-
-	uint16_t RemoteMe::getShort(uint8_t* payload, uint16_t& pos) {
-
-		uint8_t* temp = getArray(payload, pos, sizeof(uint16_t));
-
-		temp = getReverseBytes(temp, sizeof(uint16_t));
-		pos += sizeof(uint16_t);
-		uint16_t* ret = (uint16_t*)temp;
-		return  *ret;
-	}
-
-	uint32_t RemoteMe::getInt(uint8_t *payload, uint16_t& pos) {
-		uint8_t* temp = getArray(payload, pos, sizeof(uint32_t));
-		temp = getReverseBytes(temp, sizeof(uint32_t));
-		pos += sizeof(uint32_t);
-		uint32_t* ret = (uint32_t*)temp;
-
-		return  *ret;
-	}
-
-	double RemoteMe::getDouble(uint8_t *payload, uint16_t& pos) {
-		uint8_t* temp = getArray(payload, pos, sizeof(double));
-		temp = getReverseBytes(temp, sizeof(double));
-		pos += sizeof(double);
-		double* ret = (double*)temp;
-
-		return  *ret;
-	}
-	uint64_t RemoteMe::getLong(uint8_t *payload, uint16_t& pos) {
-		uint8_t* temp = getArray(payload, pos, sizeof(uint64_t));
-		temp = getReverseBytes(temp, sizeof(uint64_t));
-		pos += sizeof(uint64_t);
-		uint64_t* ret = (uint64_t*)temp;
-
-		return  *ret;
-	}
-
-	String RemoteMe::getString(uint8_t* data, uint16_t& pos) {
-
-		String ret =String((char*)(data + pos));
-		pos += ret.length() + 1;
-
-		return  ret;
-	}
-
-
-
-	uint8_t RemoteMe::getByte(uint8_t* data, uint16_t& pos) {
-		return  data[pos++];
-	}
-
-
-
-
 
 
 	void RemoteMe::sendUserMessage(RemotemeStructures::WSUserMessageSettings renevalWhenFailType, uint16_t receiverDeviceId, uint16_t messageId, const uint8_t *payload, uint16_t length) {
@@ -308,16 +214,15 @@
 		uint16_t index = 0;
 
 
-		putShort(data, index, RemotemeStructures::USER_MESSAGE);
-		putShort(data, index, size);
+		RemoteMeMessagesUtils::putShort(data, index, RemotemeStructures::USER_MESSAGE);
+		RemoteMeMessagesUtils::putShort(data, index, size);
 
-		putByte(data, index, renevalWhenFailType);
-		putShort(data, index, receiverDeviceId);
-		putShort(data, index, senderDeviceId);
-		putShort(data, index, messageId);
+		RemoteMeMessagesUtils::putByte(data, index, renevalWhenFailType);
+		RemoteMeMessagesUtils::putShort(data, index, receiverDeviceId);
+		RemoteMeMessagesUtils::putShort(data, index, senderDeviceId);
+		RemoteMeMessagesUtils::putShort(data, index, messageId);
 
-
-		putArray(data, index, payload, length);
+		RemoteMeMessagesUtils::putArray(data, index, payload, length);
 
 
 		sendByWebSocket(data, size + 4);
@@ -326,20 +231,21 @@
 
 	void RemoteMe::sendAddDataMessage(uint16_t seriesId, RemotemeStructures::AddDataMessageSetting settings, uint64_t time, double value)
 	{
-		uint16_t size = 11 + sizeof(double);
+		uint16_t size = 2+1+8+8;
 		uint8_t* data = new uint8_t[size + 4];
 
 
 		uint16_t pos = 0;
 
 
-		putShort(data, pos, RemotemeStructures::ADD_DATA);
-		putShort(data, pos, size);
+		RemoteMeMessagesUtils::putShort(data, pos, RemotemeStructures::ADD_DATA);
+		RemoteMeMessagesUtils::putShort(data, pos, size);
 
-		putShort(data, pos, seriesId);
-		putByte(data, pos, settings);
-		putLong(data, pos, time);
-		putDouble(data, pos, value);
+		RemoteMeMessagesUtils::putLong(data, pos, time);
+		RemoteMeMessagesUtils::putByte(data, pos, settings);
+		
+		RemoteMeMessagesUtils::putShort(data, pos, seriesId);
+		RemoteMeMessagesUtils::putDouble(data, pos, value);
 
 
 
@@ -353,14 +259,14 @@
 		uint16_t pos = 0;
 
 		uint8_t* dataToSent = new uint8_t[size + 4];
-		putShort(dataToSent, pos, RemotemeStructures::SYNC_RESPONSE_MESSAGE);
-		putShort(dataToSent, pos, dataSize);
+		RemoteMeMessagesUtils::putShort(dataToSent, pos, RemotemeStructures::SYNC_RESPONSE_MESSAGE);
+		RemoteMeMessagesUtils::putShort(dataToSent, pos, dataSize);
 
 
 
 
-		putLong(dataToSent, pos, messageId);
-		putArray(dataToSent, pos, data, dataSize);
+		RemoteMeMessagesUtils::putLong(dataToSent, pos, messageId);
+		RemoteMeMessagesUtils::putArray(dataToSent, pos, data, dataSize);
 
 		sendByWebSocket(dataToSent, size + 4);
 
@@ -387,13 +293,13 @@
 		uint16_t pos = 0;
 
 
-		putShort(data, pos, RemotemeStructures::REGISTER_DEVICE);
-		putShort(data, pos, size);
+		RemoteMeMessagesUtils::putShort(data, pos, RemotemeStructures::REGISTER_DEVICE);
+		RemoteMeMessagesUtils::putShort(data, pos, size);
 
-		putShort(data, pos, deviceId);
-		putString(data, pos, deviceName);
-		putByte(data, pos, deviceType);
-		putShort(data, pos, networkDeviceType);
+		RemoteMeMessagesUtils::putShort(data, pos, deviceId);
+		RemoteMeMessagesUtils::putString(data, pos, deviceName);
+		RemoteMeMessagesUtils::putByte(data, pos, deviceType);
+		RemoteMeMessagesUtils::putShort(data, pos, networkDeviceType);
 
 
 
@@ -418,12 +324,12 @@
 		uint16_t pos = 0;
 
 
-		putShort(data, pos, RemotemeStructures::REGISTER_CHILD_DEVICE);
-		putShort(data, pos, size);
+		RemoteMeMessagesUtils::putShort(data, pos, RemotemeStructures::REGISTER_CHILD_DEVICE);
+		RemoteMeMessagesUtils::putShort(data, pos, size);
 
-		putShort(data, pos, parentDeviceId);
-		putShort(data, pos, deviceId);
-		putString(data, pos, deviceName);
+		RemoteMeMessagesUtils::putShort(data, pos, parentDeviceId);
+		RemoteMeMessagesUtils::putShort(data, pos, deviceId);
+		RemoteMeMessagesUtils::putString(data, pos, deviceName);
 
 
 
@@ -445,12 +351,12 @@
 
 		uint16_t pos = 0;
 
-		putShort(data, pos, RemotemeStructures::LOGG);
-		putShort(data, pos, size);
+		RemoteMeMessagesUtils::putShort(data, pos, RemotemeStructures::LOGG);
+		RemoteMeMessagesUtils::putShort(data, pos, size);
 
 
-		putByte(data, pos, logLevel);
-		putString(data, pos, str);
+		RemoteMeMessagesUtils::putByte(data, pos, logLevel);
+		RemoteMeMessagesUtils::putString(data, pos, str);
 
 		sendByWebSocket(data, size + 4);
 	}
