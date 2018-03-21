@@ -1,9 +1,8 @@
 #define WIFI_NAME ""
 #define WIFI_PASSWORD ""
-#define DEVICE_ID 123
-#define DEVICE_NAME "my Arduino"
+#define DEVICE_ID 201
+#define DEVICE_NAME ""
 #define TOKEN ""
-
 
 #include <ArduinoHttpClient.h>
 #include <RemoteMe.h>
@@ -53,7 +52,7 @@ void onUserMessage(uint16_t senderDeviceId, uint16_t dataSize, uint8_t *data) {
 void setup() {
 	
 	Serial.begin(9600);
-	Serial.print("started");
+	Serial.println("started");
 	while (!Serial) {
 	}
 	WiFiMulti.addAP(WIFI_NAME, WIFI_PASSWORD);
@@ -61,8 +60,8 @@ void setup() {
     delay(100);
     Serial.print(".");
 	}
-	Serial.print("Connected to wifi");
-	Serial.print("Connected, IP address: ");
+	Serial.println("Connected to wifi");
+	Serial.println("Connected, IP address: ");
 	Serial.println(WiFi.localIP());
 
 
@@ -72,7 +71,7 @@ void setup() {
 	remoteMe.setupTwoWayCommunication();
 
 	remoteMe.sendRegisterDeviceMessage(DEVICE_NAME);	
-	Serial.print("setup end");
+	Serial.println("setup end");
 }
 
 

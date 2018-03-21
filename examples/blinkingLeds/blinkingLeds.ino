@@ -1,9 +1,8 @@
 #define WIFI_NAME ""
 #define WIFI_PASSWORD ""
-#define DEVICE_ID 123
-#define DEVICE_NAME "my Arduino"
+#define DEVICE_ID 201
+#define DEVICE_NAME ""
 #define TOKEN ""
-
 
 #include <ArduinoHttpClient.h>
 #include <RemoteMe.h>

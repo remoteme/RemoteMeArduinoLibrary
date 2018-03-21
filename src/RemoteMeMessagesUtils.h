@@ -50,6 +50,7 @@ namespace RemotemeStructures
 	
 		static void putShort(uint8_t* data, uint16_t &pos, uint16_t number);
 		static void putByte(uint8_t* data, uint16_t &pos, uint8_t number);
+	
 		static void putArray(uint8_t* data, uint16_t &pos, const void* number, uint16_t length);
 		static void putString(uint8_t * data, uint16_t &pos, String string);
 		static void putLong(uint8_t * data, uint16_t &pos, uint64_t number);
@@ -63,12 +64,18 @@ namespace RemotemeStructures
 		static uint16_t getShort(uint8_t *payload, uint16_t &pos);
 		static uint32_t getInt(uint8_t *payload, uint16_t &pos);
 		static uint8_t getByte(uint8_t* data, uint16_t& pos);
+		static int8_t getSignedByte(uint8_t* data, uint16_t &pos);
 		static String getString(uint8_t* data, uint16_t& pos);
 		static uint64_t getLong(uint8_t *payload, uint16_t& pos);
 		static double getDouble(uint8_t *payload, uint16_t& pos);
 
-		
-
+		static uint16_t getUserMessage(RemotemeStructures::WSUserMessageSettings renevalWhenFailType, uint16_t receiverDeviceId, uint16_t senderDeviceId, uint16_t messageId, const uint8_t *data, uint16_t length, uint8_t* &payload);
+		static uint16_t getSyncUserMessage(uint16_t receiverDeviceId, uint16_t senderDeviceId, uint64_t messageId, const uint8_t *data, uint16_t length, uint8_t* &payload);
+		static uint16_t getAddDataMessage(uint16_t seriesId, RemotemeStructures::AddDataMessageSetting settings, uint64_t time, double value, uint8_t* &payload);
+		static uint16_t getSyncResponseUserMessage(uint64_t messageId, uint16_t dataSize, uint8_t * data, uint8_t* &payload);
+		static uint16_t getRegisterDeviceMessage(uint16_t deviceId, String deviceName, RemotemeStructures::DeviceType deviceType, RemotemeStructures::NetworkDeviceType networkDeviceType, uint8_t* &payload);
+		static uint16_t getLogMessage(RemotemeStructures::LogLevel logLevel, String str, uint8_t* &payload);
+		static uint16_t getRegisterChildDeviceMessage(uint16_t parentDeviceId, uint16_t deviceId, String deviceName, uint8_t* &payload);
 	};
 
 

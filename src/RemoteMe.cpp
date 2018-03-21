@@ -57,8 +57,7 @@
 					if (rm.onUserMessage!=nullptr) {
 						rm.onUserMessage(senderDeviceId,dataSize, data);
 					}
-				}
-				else if (messageType == RemotemeStructures::USER_SYNC_MESSAGE) {
+				}else if (messageType == RemotemeStructures::USER_SYNC_MESSAGE) {
 					uint16_t receiverDeviceId = RemoteMeMessagesUtils::getShort(payload, pos);
 					uint16_t senderDeviceId = RemoteMeMessagesUtils::getShort(payload, pos);
 
@@ -78,6 +77,14 @@
 						free(returnData);
 
 					}
+
+
+				}else if (messageType == RemotemeStructures::SYNC_RESPONSE_MESSAGE) {
+					
+					rm.messageId = RemoteMeMessagesUtils::getLong(payload, pos);
+					
+					rm.syncResponseData = RemoteMeMessagesUtils::getArray(payload, pos, size);
+					rm.syncResponseDataSize = size;
 
 
 				}
@@ -111,7 +118,7 @@
 		
 	}
 	
-	void RemoteMe::sendByRest(uint8_t * payload, size_t length){
+	void RemoteMe::sendByRest(uint8_t * payload,uint16_t length ){
 
 		//secure
 		//WiFiClient  tcp = new WiFiClientSecure();
@@ -176,8 +183,34 @@
 	}
 
 	
+	uint16_t RemoteMe::sendUserSyncMessage(uint16_t receiverDeviceId, const uint8_t * payload, uint16_t length, uint8_t*& returnData) {
+
+		this->messageId = 0;
 
 
+		uint64_t messageId = millis() + 20;;
+		uint8_t *payloadSyncMessage;
+
+		uint16_t payloadSyncMessageSize = RemoteMeMessagesUtils::getSyncUserMessage(receiverDeviceId, deviceId, messageId, payload, length, payloadSyncMessage);
+		send(payloadSyncMessage, payloadSyncMessageSize);
+
+		this->messageId = 0;
+		for (uint16_t i = 0; i < 8000;i++) {//8000 give 8s becasue there is delay 1ms
+			
+			this->loop();
+			if (this->messageId == messageId) {//got reponse
+				Serial.println(this->syncResponseDataSize);
+				returnData = this->syncResponseData;
+				this->messageId = 0;
+				return this->syncResponseDataSize;
+			}
+			delay(1);
+
+		}
+
+		
+		return 0xFFFF;//error
+	}
 
 
 	void RemoteMe::sendUserMessage(RemotemeStructures::WSUserMessageSettings renevalWhenFailType, uint16_t receiverDeviceId, uint16_t messageId, const uint8_t *payload, uint16_t length) {
@@ -189,7 +222,6 @@
 	}
 
 	void RemoteMe::sendUserMessage(RemotemeStructures::WSUserMessageSettings renevalWhenFailType, uint16_t receiverDeviceId, uint16_t senderDeviceId, uint16_t messageId, String message) {
-
 		const uint8_t* data = reinterpret_cast<const uint8_t*>(&message[0]);
 		sendUserMessage(renevalWhenFailType, receiverDeviceId, senderDeviceId, messageId, data, message.length()+1);
 	}
@@ -206,108 +238,53 @@
 
 
 
-	void RemoteMe::sendUserMessage(RemotemeStructures::WSUserMessageSettings renevalWhenFailType, uint16_t receiverDeviceId, uint16_t senderDeviceId, uint16_t messageId, const uint8_t *payload, uint16_t length) {
-		uint16_t size = 7 + length;
-		uint8_t* data = new uint8_t[size + 4];
-
-
-		uint16_t index = 0;
-
-
-		RemoteMeMessagesUtils::putShort(data, index, RemotemeStructures::USER_MESSAGE);
-		RemoteMeMessagesUtils::putShort(data, index, size);
-
-		RemoteMeMessagesUtils::putByte(data, index, renevalWhenFailType);
-		RemoteMeMessagesUtils::putShort(data, index, receiverDeviceId);
-		RemoteMeMessagesUtils::putShort(data, index, senderDeviceId);
-		RemoteMeMessagesUtils::putShort(data, index, messageId);
-
-		RemoteMeMessagesUtils::putArray(data, index, payload, length);
-
-
-		sendByWebSocket(data, size + 4);
-
+	void RemoteMe::sendUserMessage(RemotemeStructures::WSUserMessageSettings renevalWhenFailType, uint16_t receiverDeviceId, 	uint16_t senderDeviceId, uint16_t messageId, const uint8_t *payload, uint16_t length) {
+		
+		uint8_t * data;
+		uint16_t size = RemoteMeMessagesUtils::getUserMessage(renevalWhenFailType, receiverDeviceId, senderDeviceId, messageId, payload, length, data);
+		send(data,size);
 	}
 
 	void RemoteMe::sendAddDataMessage(uint16_t seriesId, RemotemeStructures::AddDataMessageSetting settings, uint64_t time, double value)
 	{
-		uint16_t size = 2+1+8+8;
-		uint8_t* data = new uint8_t[size + 4];
+		uint8_t * data;
+		uint16_t size = RemoteMeMessagesUtils::getAddDataMessage(seriesId, settings, time, value, data);
 
-
-		uint16_t pos = 0;
-
-
-		RemoteMeMessagesUtils::putShort(data, pos, RemotemeStructures::ADD_DATA);
-		RemoteMeMessagesUtils::putShort(data, pos, size);
-
-		RemoteMeMessagesUtils::putLong(data, pos, time);
-		RemoteMeMessagesUtils::putByte(data, pos, settings);
 		
-		RemoteMeMessagesUtils::putShort(data, pos, seriesId);
-		RemoteMeMessagesUtils::putDouble(data, pos, value);
+		send(data,size);
+		
 
-
-
-		sendByWebSocket(data, size + 4);
 	}
 
-	void RemoteMe::sendSyncResponseUserMessage(uint64_t messageId, uint16_t dataSize, uint8_t * data)
+	void RemoteMe::sendSyncResponseUserMessage(uint64_t messageId, uint16_t dataSize, uint8_t * dataS)
 	{
-		uint16_t size = 8 + dataSize;
-
-		uint16_t pos = 0;
-
-		uint8_t* dataToSent = new uint8_t[size + 4];
-		RemoteMeMessagesUtils::putShort(dataToSent, pos, RemotemeStructures::SYNC_RESPONSE_MESSAGE);
-		RemoteMeMessagesUtils::putShort(dataToSent, pos, dataSize);
-
-
-
-
-		RemoteMeMessagesUtils::putLong(dataToSent, pos, messageId);
-		RemoteMeMessagesUtils::putArray(dataToSent, pos, data, dataSize);
-
-		sendByWebSocket(dataToSent, size + 4);
-
+		uint8_t* data;
+		uint16_t size=RemoteMeMessagesUtils::getSyncResponseUserMessage(messageId, dataSize, dataS,data);
+		send(data,size);
 
 	}
 
+
+	void  RemoteMe::sendRegisterDeviceMessage(uint16_t deviceId, String deviceName, RemotemeStructures::DeviceType deviceType, RemotemeStructures::NetworkDeviceType networkDeviceType) {
+		uint8_t * data;
+		uint16_t size = RemoteMeMessagesUtils::getRegisterDeviceMessage(deviceId, deviceName, deviceType, networkDeviceType, data);
+		send(data,size);
+
+	}
 	
-	void RemoteMe::sendByWebSocket(uint8_t * payload, size_t length) {
+	void RemoteMe::send(uint8_t * payload,uint16_t size ) {
+	
+		Serial.println(size);
 		if (webSocketConnected) {
-			webSocket->sendBIN(payload, length);
+			webSocket->sendBIN(payload, size);
 		}else {
-			sendByRest(payload, length);
+			sendByRest(payload, size);
 		}
 	
 	}
 
 	
 
-	void  RemoteMe::sendRegisterDeviceMessage(uint16_t deviceId, String deviceName, RemotemeStructures::DeviceType deviceType, RemotemeStructures::NetworkDeviceType networkDeviceType) {
-		uint16_t size = 2+2 + deviceName.length()+1+1;
-		uint8_t* data = new uint8_t[size + 4];
-
-
-		uint16_t pos = 0;
-
-
-		RemoteMeMessagesUtils::putShort(data, pos, RemotemeStructures::REGISTER_DEVICE);
-		RemoteMeMessagesUtils::putShort(data, pos, size);
-
-		RemoteMeMessagesUtils::putShort(data, pos, deviceId);
-		RemoteMeMessagesUtils::putString(data, pos, deviceName);
-		RemoteMeMessagesUtils::putByte(data, pos, deviceType);
-		RemoteMeMessagesUtils::putShort(data, pos, networkDeviceType);
-
-
-
-
-
-		sendByWebSocket(data, size + 4);
-
-	}
 
 	void RemoteMe::sendRegisterDeviceMessage(String deviceName) {
 		sendRegisterDeviceMessage(deviceId, deviceName, RemotemeStructures::NETWORK, RemotemeStructures::ND_ARDUINO);
@@ -317,24 +294,11 @@
 
 
 	void RemoteMe::sendRegisterChildDeviceMessage(uint16_t parentDeviceId, uint16_t deviceId, String deviceName) {
-		uint16_t size = 5 + deviceName.length();//4 short  + 1 for 0 for string
-		uint8_t* data = new uint8_t[size + 4];
-
-
-		uint16_t pos = 0;
-
-
-		RemoteMeMessagesUtils::putShort(data, pos, RemotemeStructures::REGISTER_CHILD_DEVICE);
-		RemoteMeMessagesUtils::putShort(data, pos, size);
-
-		RemoteMeMessagesUtils::putShort(data, pos, parentDeviceId);
-		RemoteMeMessagesUtils::putShort(data, pos, deviceId);
-		RemoteMeMessagesUtils::putString(data, pos, deviceName);
-
-
-
-		sendByWebSocket(data, size + 4);
+		uint8_t* data;
+		uint16_t  size= RemoteMeMessagesUtils::getRegisterChildDeviceMessage(parentDeviceId, deviceId, deviceName, data);
+		send(data, size);
 	}
+
 	void RemoteMe::sendRegisterChildDeviceMessage(uint16_t deviceId, String deviceName) {
 		sendRegisterChildDeviceMessage(this->deviceId, deviceId, "");
 	}
@@ -346,19 +310,11 @@
 
 
 	void RemoteMe::sendLogMessage(RemotemeStructures::LogLevel logLevel, String str) {
-		uint16_t size = 2 + str.length();
-		uint8_t* data = new uint8_t[size + 4];
+		uint8_t* data;
+		uint16_t size= RemoteMeMessagesUtils::getLogMessage(logLevel, str,data);
+		send(data,size);
 
-		uint16_t pos = 0;
-
-		RemoteMeMessagesUtils::putShort(data, pos, RemotemeStructures::LOGG);
-		RemoteMeMessagesUtils::putShort(data, pos, size);
-
-
-		RemoteMeMessagesUtils::putByte(data, pos, logLevel);
-		RemoteMeMessagesUtils::putString(data, pos, str);
-
-		sendByWebSocket(data, size + 4);
+		
 	}
 
 	void RemoteMe::setUserMessageListener(void(*onUserMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t *data))
@@ -418,4 +374,10 @@
 			}
 		}
 		
+	}
+
+	void RemoteMe::disconnect() {
+		if (webSocket != nullptr) {
+			webSocket->disconnect();
+		}
 	}

@@ -22,6 +22,9 @@
 
 		WebSocketsClient* webSocket = nullptr;
 
+		uint64_t messageId = 0;//used for reponse
+		uint8_t* syncResponseData; //used for reponse
+		uint16_t syncResponseDataSize;
 
 	private:
 		bool twoWayCommunicationEnabled = false;
@@ -42,8 +45,8 @@
 		void createWebSocket();
 		void waitForWebSocketConnect();
 	protected:
-		void sendByWebSocket(uint8_t * payload, size_t length);
-		void sendByRest(uint8_t * payload, size_t length);
+		
+		void sendByRest(uint8_t * payload, uint16_t length);
 	public:
 		static RemoteMe& getInstance(char * token, int deviceId)
 		{
@@ -59,11 +62,13 @@
 		static void webSocketEvent(WStype_t type, uint8_t *payload, size_t length);
 		void setupTwoWayCommunication();
 		void loop();
-
-		
+		void disconnect();
+		void send(uint8_t * payload, uint16_t size);
 		
 
 		void sendAddDataMessage(uint16_t seriesId, RemotemeStructures::AddDataMessageSetting settings, uint64_t time, double value);
+
+		uint16_t sendUserSyncMessage(uint16_t receiverDeviceId, const uint8_t * payload, uint16_t length, uint8_t*& returnData);
 
 		void sendUserMessage(RemotemeStructures::WSUserMessageSettings renevalWhenFailType, uint16_t receiverDeviceId, uint16_t messageId, const uint8_t * payload, uint16_t length);
 		void sendUserMessage(RemotemeStructures::WSUserMessageSettings renevalWhenFailType, uint16_t receiverDeviceId, uint16_t senderDeviceId, uint16_t messageId, const uint8_t *payload, uint16_t length);
@@ -99,24 +104,7 @@
 		}
 
 		
-		void static putShort(uint8_t* data, uint16_t &pos, uint16_t number);
-		void static putByte(uint8_t* data, uint16_t &pos, uint8_t number);
-		void static putArray(uint8_t* data, uint16_t &pos, const void* number, uint16_t length);
-		void static putString(uint8_t * data, uint16_t &pos, String string);
-		void static putLong(uint8_t * data, uint16_t &pos, uint64_t number);
-		void static putInt(uint8_t * data, uint16_t &pos, uint32_t number);
-		void static putDouble(uint8_t * data, uint16_t &pos, double value);
-		void static putFloat(uint8_t * data, uint16_t &pos, float value);
 		
-		void static putBigEndian(uint8_t * data, uint16_t &pos, void * value, uint16_t size);
-		
-		static uint8_t *getArray(uint8_t *data, uint16_t &pos, uint16_t length);
-		static uint16_t getShort(uint8_t *payload, uint16_t &pos);
-		static uint32_t getInt(uint8_t *payload, uint16_t &pos);
-		static uint8_t getByte(uint8_t* data, uint16_t& pos);
-		static String getString(uint8_t* data, uint16_t& pos);
-		static uint64_t getLong(uint8_t *payload, uint16_t& pos);
-		static double getDouble(uint8_t *payload, uint16_t& pos);
 
 		template<typename... Args> void sendLogMessage(const char* fmt, Args... args) {
 			sendLogMessage(RemotemeStructures::INFO, fmt, args...);
