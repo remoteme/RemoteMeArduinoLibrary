@@ -4,9 +4,6 @@
 
 
 
-#define HOST "192.168.0.30"
-#define PORT 8082
-
 
 #include "RemoteMe.h"
 
@@ -44,13 +41,13 @@
 				uint16_t pos = 0;
 				RemoteMe& rm = RemoteMe::getInstance("", 0);
 
-				RemotemeStructures::MessageType messageType = static_cast<RemotemeStructures::MessageType> (RemoteMeMessagesUtils::getShort(payload, pos));
-				uint16_t size = RemoteMeMessagesUtils::getShort(payload, pos);
+				RemotemeStructures::MessageType messageType = static_cast<RemotemeStructures::MessageType> (RemoteMeMessagesUtils::getUint16(payload, pos));
+				uint16_t size = RemoteMeMessagesUtils::getUint16(payload, pos);
 				if (messageType == RemotemeStructures::USER_MESSAGE) {
-					RemotemeStructures::WSUserMessageSettings userMessageSettings = static_cast<RemotemeStructures::WSUserMessageSettings>(RemoteMeMessagesUtils::getByte(payload, pos));
-					uint16_t receiverDeviceId = RemoteMeMessagesUtils::getShort(payload, pos);
-					uint16_t senderDeviceId = RemoteMeMessagesUtils::getShort(payload, pos);
-					uint16_t messageId = RemoteMeMessagesUtils::getShort(payload, pos);
+					RemotemeStructures::WSUserMessageSettings userMessageSettings = static_cast<RemotemeStructures::WSUserMessageSettings>(RemoteMeMessagesUtils::getUint8(payload, pos));
+					uint16_t receiverDeviceId = RemoteMeMessagesUtils::getUint16(payload, pos);
+					uint16_t senderDeviceId = RemoteMeMessagesUtils::getUint16(payload, pos);
+					uint16_t messageId = RemoteMeMessagesUtils::getUint16(payload, pos);
 
 					uint16_t dataSize = size - pos + 4;// -4 2 for suze 2 for bytes becasuse size is without this
 					uint8_t* data = RemoteMeMessagesUtils::getArray(payload, pos, dataSize);
@@ -58,10 +55,10 @@
 						rm.onUserMessage(senderDeviceId,dataSize, data);
 					}
 				}else if (messageType == RemotemeStructures::USER_SYNC_MESSAGE) {
-					uint16_t receiverDeviceId = RemoteMeMessagesUtils::getShort(payload, pos);
-					uint16_t senderDeviceId = RemoteMeMessagesUtils::getShort(payload, pos);
+					uint16_t receiverDeviceId = RemoteMeMessagesUtils::getUint16(payload, pos);
+					uint16_t senderDeviceId = RemoteMeMessagesUtils::getUint16(payload, pos);
 
-					uint64_t messageId = RemoteMeMessagesUtils::getLong(payload, pos);
+					uint64_t messageId = RemoteMeMessagesUtils::getInt64(payload, pos);
 
 					uint16_t dataSize = size - pos + 4;
 					uint8_t* data = RemoteMeMessagesUtils::getArray(payload, pos, dataSize);
@@ -81,7 +78,7 @@
 
 				}else if (messageType == RemotemeStructures::SYNC_RESPONSE_MESSAGE) {
 					
-					rm.messageId = RemoteMeMessagesUtils::getLong(payload, pos);
+					rm.messageId = RemoteMeMessagesUtils::getInt64(payload, pos);
 					
 					rm.syncResponseData = RemoteMeMessagesUtils::getArray(payload, pos, size);
 					rm.syncResponseDataSize = size;
@@ -102,7 +99,7 @@
 		HttpClient* httpClient;
 		if (httpClient == nullptr) {
 			WiFiClient wifiClient;
-			httpClient = new HttpClient(wifiClient, HOST, PORT);
+			httpClient = new HttpClient(wifiClient, REMOTEME_HOST, REMOTEME_PORT);
 		}
 		
 		httpClient->beginRequest();
@@ -128,7 +125,7 @@
 		if (httpClient == nullptr) {
 			WiFiClient wifiClient;
 
-			httpClient = new HttpClient(wifiClient, HOST, PORT);
+			httpClient = new HttpClient(wifiClient, REMOTEME_HOST, REMOTEME_PORT);
 
 		}
 

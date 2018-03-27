@@ -27,21 +27,21 @@ void RemoteMeMessagesUtils::putArray(uint8_t* data, uint16_t &pos, const void* a
 	pos += length;
 }
 
-void RemoteMeMessagesUtils::putByte(uint8_t* data, uint16_t &pos, uint8_t number) {
+void RemoteMeMessagesUtils::putUint8(uint8_t* data, uint16_t &pos, uint8_t number) {
 	data[pos++] = number;
 
 
 }
 
-void RemoteMeMessagesUtils::putShort(uint8_t* data, uint16_t &pos, uint16_t number) {
+void RemoteMeMessagesUtils::putUint16(uint8_t* data, uint16_t &pos, uint16_t number) {
 	putBigEndian(data, pos, &number, sizeof(uint16_t));
 }
 
-void RemoteMeMessagesUtils::putLong(uint8_t* data, uint16_t &pos, uint64_t number) {
+void RemoteMeMessagesUtils::putUint64(uint8_t* data, uint16_t &pos, uint64_t number) {
 	putBigEndian(data, pos, &number, sizeof(uint64_t));
 }
 
-void RemoteMeMessagesUtils::putInt(uint8_t* data, uint16_t &pos, uint32_t number) {
+void RemoteMeMessagesUtils::putUint32(uint8_t* data, uint16_t &pos, uint32_t number) {
 	putBigEndian(data, pos, &number, sizeof(uint32_t));
 }
 
@@ -72,7 +72,7 @@ uint8_t* RemoteMeMessagesUtils::getArray(uint8_t* data, uint16_t& pos, uint16_t 
 
 }
 
-uint16_t RemoteMeMessagesUtils::getShort(uint8_t* payload, uint16_t& pos) {
+uint16_t RemoteMeMessagesUtils::getUint16(uint8_t* payload, uint16_t& pos) {
 
 	uint8_t* temp = getArray(payload, pos, sizeof(uint16_t));
 
@@ -82,7 +82,7 @@ uint16_t RemoteMeMessagesUtils::getShort(uint8_t* payload, uint16_t& pos) {
 	return  *ret;
 }
 
-uint32_t RemoteMeMessagesUtils::getInt(uint8_t *payload, uint16_t& pos) {
+uint32_t RemoteMeMessagesUtils::getUint32(uint8_t *payload, uint16_t& pos) {
 	uint8_t* temp = getArray(payload, pos, sizeof(uint32_t));
 	temp = getReverseBytes(temp, sizeof(uint32_t));
 	pos += sizeof(uint32_t);
@@ -99,7 +99,7 @@ double RemoteMeMessagesUtils::getDouble(uint8_t *payload, uint16_t& pos) {
 
 	return  *ret;
 }
-uint64_t RemoteMeMessagesUtils::getLong(uint8_t *payload, uint16_t& pos) {
+uint64_t RemoteMeMessagesUtils::getInt64(uint8_t *payload, uint16_t& pos) {
 	uint8_t* temp = getArray(payload, pos, sizeof(uint64_t));
 	temp = getReverseBytes(temp, sizeof(uint64_t));
 	pos += sizeof(uint64_t);
@@ -120,11 +120,11 @@ String RemoteMeMessagesUtils::getString(uint8_t* data, uint16_t& pos) {
 
 
 
-uint8_t RemoteMeMessagesUtils::getByte(uint8_t* data, uint16_t& pos) {
+uint8_t RemoteMeMessagesUtils::getUint8(uint8_t* data, uint16_t& pos) {
 	return  data[pos++];
 }
 
-int8_t RemoteMeMessagesUtils::getSignedByte(uint8_t* data, uint16_t& pos) {
+int8_t RemoteMeMessagesUtils::getInt8(uint8_t* data, uint16_t& pos) {
 	return  data[pos++];
 }
 
@@ -144,12 +144,12 @@ uint16_t RemoteMeMessagesUtils::getSyncUserMessage(uint16_t receiverDeviceId, ui
 	uint16_t size = 12 + length;
 	payload = new uint8_t[size + 4];
 	uint16_t index = 0;
-	RemoteMeMessagesUtils::putShort(payload, index, RemotemeStructures::USER_SYNC_MESSAGE);
-	RemoteMeMessagesUtils::putShort(payload, index, size);
+	RemoteMeMessagesUtils::putUint16(payload, index, RemotemeStructures::USER_SYNC_MESSAGE);
+	RemoteMeMessagesUtils::putUint16(payload, index, size);
 
-	RemoteMeMessagesUtils::putShort(payload, index, receiverDeviceId);
-	RemoteMeMessagesUtils::putShort(payload, index, senderDeviceId);
-	RemoteMeMessagesUtils::putLong(payload, index, messageId);
+	RemoteMeMessagesUtils::putUint16(payload, index, receiverDeviceId);
+	RemoteMeMessagesUtils::putUint16(payload, index, senderDeviceId);
+	RemoteMeMessagesUtils::putUint64(payload, index, messageId);
 
 
 	RemoteMeMessagesUtils::putArray(payload, index, data, length);
@@ -165,13 +165,13 @@ uint16_t RemoteMeMessagesUtils::getUserMessage(RemotemeStructures::WSUserMessage
 	uint16_t index = 0;
 
 
-	RemoteMeMessagesUtils::putShort(payload, index, RemotemeStructures::USER_MESSAGE);
-	RemoteMeMessagesUtils::putShort(payload, index, size);
+	RemoteMeMessagesUtils::putUint16(payload, index, RemotemeStructures::USER_MESSAGE);
+	RemoteMeMessagesUtils::putUint16(payload, index, size);
 
-	RemoteMeMessagesUtils::putByte(payload, index, renevalWhenFailType);
-	RemoteMeMessagesUtils::putShort(payload, index, receiverDeviceId);
-	RemoteMeMessagesUtils::putShort(payload, index, senderDeviceId);
-	RemoteMeMessagesUtils::putShort(payload, index, messageId);
+	RemoteMeMessagesUtils::putUint8(payload, index, renevalWhenFailType);
+	RemoteMeMessagesUtils::putUint16(payload, index, receiverDeviceId);
+	RemoteMeMessagesUtils::putUint16(payload, index, senderDeviceId);
+	RemoteMeMessagesUtils::putUint16(payload, index, messageId);
 
 	RemoteMeMessagesUtils::putArray(payload, index, data, length);
 
@@ -189,13 +189,13 @@ uint16_t  RemoteMeMessagesUtils::getAddDataMessage(uint16_t seriesId, RemotemeSt
 	uint16_t pos = 0;
 
 
-	RemoteMeMessagesUtils::putShort(payload, pos, RemotemeStructures::ADD_DATA);
-	RemoteMeMessagesUtils::putShort(payload, pos, size);
+	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::ADD_DATA);
+	RemoteMeMessagesUtils::putUint16(payload, pos, size);
 
-	RemoteMeMessagesUtils::putLong(payload, pos, time);
-	RemoteMeMessagesUtils::putByte(payload, pos, settings);
+	RemoteMeMessagesUtils::putUint64(payload, pos, time);
+	RemoteMeMessagesUtils::putUint8(payload, pos, settings);
 
-	RemoteMeMessagesUtils::putShort(payload, pos, seriesId);
+	RemoteMeMessagesUtils::putUint16(payload, pos, seriesId);
 	RemoteMeMessagesUtils::putDouble(payload, pos, value);
 
 	return size+4;
@@ -209,12 +209,12 @@ uint16_t RemoteMeMessagesUtils::getSyncResponseUserMessage(uint64_t messageId, u
 	uint16_t pos = 0;
 
 	payload = new uint8_t[size + 4];
-	RemoteMeMessagesUtils::putShort(payload, pos, RemotemeStructures::SYNC_RESPONSE_MESSAGE);
-	RemoteMeMessagesUtils::putShort(payload, pos, dataSize);
+	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::SYNC_RESPONSE_MESSAGE);
+	RemoteMeMessagesUtils::putUint16(payload, pos, dataSize);
 
 
 
-	RemoteMeMessagesUtils::putLong(payload, pos, messageId);
+	RemoteMeMessagesUtils::putUint64(payload, pos, messageId);
 	RemoteMeMessagesUtils::putArray(payload, pos, data, dataSize);
 
 	return size+4;
@@ -230,13 +230,13 @@ uint16_t   RemoteMeMessagesUtils::getRegisterDeviceMessage(uint16_t deviceId, St
 	uint16_t pos = 0;
 
 
-	RemoteMeMessagesUtils::putShort(payload, pos, RemotemeStructures::REGISTER_DEVICE);
-	RemoteMeMessagesUtils::putShort(payload, pos, size);
+	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::REGISTER_DEVICE);
+	RemoteMeMessagesUtils::putUint16(payload, pos, size);
 
-	RemoteMeMessagesUtils::putShort(payload, pos, deviceId);
+	RemoteMeMessagesUtils::putUint16(payload, pos, deviceId);
 	RemoteMeMessagesUtils::putString(payload, pos, deviceName);
-	RemoteMeMessagesUtils::putByte(payload, pos, deviceType);
-	RemoteMeMessagesUtils::putShort(payload, pos, networkDeviceType);
+	RemoteMeMessagesUtils::putUint8(payload, pos, deviceType);
+	RemoteMeMessagesUtils::putUint16(payload, pos, networkDeviceType);
 
 
 
@@ -251,11 +251,11 @@ uint16_t RemoteMeMessagesUtils::getLogMessage(RemotemeStructures::LogLevel logLe
 
 	uint16_t pos = 0;
 
-	RemoteMeMessagesUtils::putShort(payload, pos, RemotemeStructures::LOGG);
-	RemoteMeMessagesUtils::putShort(payload, pos, size);
+	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::LOGG);
+	RemoteMeMessagesUtils::putUint16(payload, pos, size);
 
 
-	RemoteMeMessagesUtils::putByte(payload, pos, logLevel);
+	RemoteMeMessagesUtils::putUint8(payload, pos, logLevel);
 	RemoteMeMessagesUtils::putString(payload, pos, str);
 
 	return size+4;
@@ -269,11 +269,11 @@ uint16_t RemoteMeMessagesUtils::getRegisterChildDeviceMessage(uint16_t parentDev
 	uint16_t pos = 0;
 
 
-	RemoteMeMessagesUtils::putShort(payload, pos, RemotemeStructures::REGISTER_CHILD_DEVICE);
-	RemoteMeMessagesUtils::putShort(payload, pos, size);
+	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::REGISTER_CHILD_DEVICE);
+	RemoteMeMessagesUtils::putUint16(payload, pos, size);
 
-	RemoteMeMessagesUtils::putShort(payload, pos, parentDeviceId);
-	RemoteMeMessagesUtils::putShort(payload, pos, deviceId);
+	RemoteMeMessagesUtils::putUint16(payload, pos, parentDeviceId);
+	RemoteMeMessagesUtils::putUint16(payload, pos, deviceId);
 	RemoteMeMessagesUtils::putString(payload, pos, deviceName);
 
 

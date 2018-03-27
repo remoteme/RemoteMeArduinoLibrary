@@ -48,25 +48,25 @@ namespace RemotemeStructures
 		
 	public:
 	
-		static void putShort(uint8_t* data, uint16_t &pos, uint16_t number);
-		static void putByte(uint8_t* data, uint16_t &pos, uint8_t number);
+		static void putUint16(uint8_t* data, uint16_t &pos, uint16_t number);
+		static void putUint8(uint8_t* data, uint16_t &pos, uint8_t number);
 	
 		static void putArray(uint8_t* data, uint16_t &pos, const void* number, uint16_t length);
 		static void putString(uint8_t * data, uint16_t &pos, String string);
-		static void putLong(uint8_t * data, uint16_t &pos, uint64_t number);
-		static void putInt(uint8_t * data, uint16_t &pos, uint32_t number);
+		static void putUint64(uint8_t * data, uint16_t &pos, uint64_t number);
+		static void putUint32(uint8_t * data, uint16_t &pos, uint32_t number);
 		static void putDouble(uint8_t * data, uint16_t &pos, double value);
 		static void putFloat(uint8_t * data, uint16_t &pos, float value);
 		
 		static void putBigEndian(uint8_t * data, uint16_t &pos, void * value, uint16_t size);
 		
 		static uint8_t *getArray(uint8_t *data, uint16_t &pos, uint16_t length);
-		static uint16_t getShort(uint8_t *payload, uint16_t &pos);
-		static uint32_t getInt(uint8_t *payload, uint16_t &pos);
-		static uint8_t getByte(uint8_t* data, uint16_t& pos);
-		static int8_t getSignedByte(uint8_t* data, uint16_t &pos);
+		static uint16_t getUint16(uint8_t *payload, uint16_t &pos);
+		static uint32_t getUint32(uint8_t *payload, uint16_t &pos);
+		static uint8_t getUint8(uint8_t* data, uint16_t& pos);
+		static int8_t getInt8(uint8_t* data, uint16_t &pos);
 		static String getString(uint8_t* data, uint16_t& pos);
-		static uint64_t getLong(uint8_t *payload, uint16_t& pos);
+		static uint64_t getInt64(uint8_t *payload, uint16_t& pos);
 		static double getDouble(uint8_t *payload, uint16_t& pos);
 
 		static uint16_t getUserMessage(RemotemeStructures::WSUserMessageSettings renevalWhenFailType, uint16_t receiverDeviceId, uint16_t senderDeviceId, uint16_t messageId, const uint8_t *data, uint16_t length, uint8_t* &payload);
