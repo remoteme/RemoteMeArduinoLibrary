@@ -11,39 +11,43 @@
 
 
 #define REMOTEME_HOST "app.remoteme.org"
-#define REMOTEME_PORT 80
+#define REMOTEME_HTTP_PORT 80
+#define REMOTEME_SOCKET_PORT 18
 
 #include "RemoteMeMessagesUtils.h"
 	class RemoteMe
 	{
 		const char * token;
 		uint16_t deviceId;
-		bool webSocketConnected;
+		bool webSocketConnected = false;
+		bool socketConnected = false;
 
 		WebSocketsClient* webSocket = nullptr;
+		WiFiClient* wifiClient = nullptr;
 
 		uint64_t messageId = 0;//used for reponse
 		uint8_t* syncResponseData; //used for reponse
 		uint16_t syncResponseDataSize;
 
 	private:
-		bool twoWayCommunicationEnabled = false;
+		bool webSocketEnabled = false;
+		bool socketEnabled = false;
 
 		RemoteMe(char * token, uint16_t deviceId);
 
 		
-
+		void socketLoop();
 
 		
-		
+		void processMessage(uint8_t *payload);
 		
 		void(*onUserMessage)(uint16_t senderDeviceId , uint16_t dataSize , uint8_t* data) = nullptr;
 		void(*onUserSyncMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t*, uint16_t& returnDataSize, uint8_t*& returnData ) = nullptr;
 
 		void sendSyncResponseUserMessage(uint64_t messageId, uint16_t dataSize, uint8_t* data);
 
-		void createWebSocket();
-		void waitForWebSocketConnect();
+		bool ping();
+		void waitForConnection();
 	protected:
 		
 		void sendByRest(uint8_t * payload, uint16_t length);
@@ -61,6 +65,7 @@
 
 		static void webSocketEvent(WStype_t type, uint8_t *payload, size_t length);
 		void setupTwoWayCommunication();
+		void setupTwoWayWebSocketCommunication();
 		void loop();
 		void disconnect();
 		void send(uint8_t * payload, uint16_t size);

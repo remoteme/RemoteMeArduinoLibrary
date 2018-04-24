@@ -210,7 +210,7 @@ uint16_t RemoteMeMessagesUtils::getSyncResponseUserMessage(uint64_t messageId, u
 
 	payload = new uint8_t[size + 4];
 	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::SYNC_RESPONSE_MESSAGE);
-	RemoteMeMessagesUtils::putUint16(payload, pos, dataSize);
+	RemoteMeMessagesUtils::putUint16(payload, pos, size);
 
 
 
