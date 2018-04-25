@@ -348,7 +348,7 @@
 		static unsigned long lastTimeRestart = 0;
 
 		if (webSocketEnabled || socketEnabled) {
-			if (lastTimePing + 5000 < millis()) {
+			if (lastTimePing + 20000 < millis()) {
 				ping();
 
 				lastTimePing = millis();
