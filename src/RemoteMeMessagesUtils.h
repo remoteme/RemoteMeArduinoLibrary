@@ -24,7 +24,7 @@ namespace RemotemeStructures
 	enum WSUserMessageSettings { NO_RENEWAL = 0, RENEWAL_IF_FAILED = 1 };
 
 
-	enum AddDataMessageSetting { NO_ROUND = 0, _1S = 1, _2S = 2, _5S = 3, _10S = 4, _15S = 5, _20S = 6, _30S = 7 ,_1M=8,_5M=9,_10M=10,_15M=11,_30M=12,_1G=13,_2G=13,_3G=13,_4G=14,_5G=15,_6G=16};
+	enum AddDataMessageSetting { NO_ROUND = 0, _1S = 1, _2S = 2, _5S = 3, _10S = 4, _15S = 5, _20S = 6, _30S = 7 ,_1M=8,_5M=9,_10M=10,_15M=11,_30M=12,_1H=13,_2H=13,_3H=13,_4H=14,_5H=15,_6H=16};
 	enum DeviceType { NETWORK = 1, SMARTPHONE = 2, WEBPAGE = 3, JSSCRIPT = 4 };
 	enum LogLevel { INFO = 1, WARN = 2, ERROR = 3 };
 	enum LeafDeviceType { LD_OTHER_SOCKET = 1, LD_EXTERNAL_SCRIPT = 2, LD_SERIAL = 3, LD_NRF24 = 4, LD_GPIO = 5 };

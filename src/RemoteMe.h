@@ -48,6 +48,7 @@
 
 		bool ping();
 		void waitForConnection();
+		long deltaMillis();
 	protected:
 		
 		void sendByRest(uint8_t * payload, uint16_t length);

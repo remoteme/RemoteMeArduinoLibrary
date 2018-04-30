@@ -172,7 +172,7 @@
 		this->messageId = 0;
 
 
-		uint64_t messageId = millis() + 20;;
+		uint64_t messageId = deltaMillis() + 20;;
 		uint8_t *payloadSyncMessage;
 
 		uint16_t payloadSyncMessageSize = RemoteMeMessagesUtils::getSyncUserMessage(receiverDeviceId, deviceId, messageId, payload, length, payloadSyncMessage);
@@ -348,15 +348,15 @@
 		static unsigned long lastTimeRestart = 0;
 
 		if (webSocketEnabled || socketEnabled) {
-			if (lastTimePing + 20000 < millis()) {
+			if (lastTimePing + 20000 < deltaMillis()) {
 				ping();
 
-				lastTimePing = millis();
+				lastTimePing = deltaMillis();
 			}
 			while (!(socketConnected || webSocketConnected)) {
 
-				if (lastTimeRestart + 20000 < millis()) {//restart every 20s
-					lastTimeRestart = millis();
+				if (lastTimeRestart + 20000 < deltaMillis()) {//restart every 20s
+					lastTimeRestart = deltaMillis();
 					if (webSocketEnabled) {
 						if (webSocket != nullptr) {
 							webSocket->disconnect();
@@ -374,6 +374,10 @@
 
 					}
 					else if (socketEnabled) {
+						if (wifiClient != nullptr) {
+							wifiClient->stop();
+						}
+						
 						wifiClient = new WiFiClient();
 
 						if (wifiClient->connect(REMOTEME_HOST, REMOTEME_SOCKET_PORT)) {
@@ -429,10 +433,10 @@
 			buffer = (uint8_t*)malloc(size + 4);
 			RemoteMeMessagesUtils::putUint16(buffer, bufferPos, messageId);
 			RemoteMeMessagesUtils::putUint16(buffer, bufferPos, size);
-			unsigned long time = millis();
+			unsigned long time = deltaMillis();
 			bool error = false;
 			while (wifiClient->available() <size) {
-				if (millis()<time + 3000) {//timeout
+				if (deltaMillis()<time + 3000) {//timeout
 					return;
 				}
 			}
@@ -448,5 +452,14 @@
 	void RemoteMe::disconnect() {
 		if (webSocket != nullptr) {
 			webSocket->disconnect();
+			webSocket=nullptr;
 		}
+		if (wifiClient != nullptr) {
+			wifiClient->stop();
+			wifiClient=nullptr;
+		}
+	}
+	
+	long RemoteMe::deltaMillis(){
+		return millis()+1e6;//so functions to restart conenciton woutn wait 20s without when first time connect
 	}
