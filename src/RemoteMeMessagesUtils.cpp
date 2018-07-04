@@ -104,8 +104,7 @@ uint64_t RemoteMeMessagesUtils::getInt64(uint8_t *payload, uint16_t& pos) {
 	temp = getReverseBytes(temp, sizeof(uint64_t));
 	pos += sizeof(uint64_t);
 	uint64_t* ret = (uint64_t*)temp;
-
-	//uint32_t u = *(uint32_t*)&x;
+	
 
 	return  *ret;
 }
@@ -202,7 +201,7 @@ uint16_t  RemoteMeMessagesUtils::getAddDataMessage(uint16_t seriesId, RemotemeSt
 
 }
 
-uint16_t RemoteMeMessagesUtils::getSyncResponseUserMessage(uint64_t messageId, uint16_t dataSize, uint8_t * data, uint8_t* &payload)
+uint16_t RemoteMeMessagesUtils::getSyncResponseMessage(uint64_t messageId, uint16_t dataSize, uint8_t * data, uint8_t* &payload)
 {
 	uint16_t size = 8 + dataSize;
 
@@ -221,6 +220,8 @@ uint16_t RemoteMeMessagesUtils::getSyncResponseUserMessage(uint64_t messageId, u
 
 
 }
+
+
 
 uint16_t   RemoteMeMessagesUtils::getRegisterDeviceMessage(uint16_t deviceId, String deviceName, RemotemeStructures::DeviceType deviceType, RemotemeStructures::NetworkDeviceType networkDeviceType, uint8_t* &payload) {
 	uint16_t size = 2 + 2 + deviceName.length() + 1 + 1;

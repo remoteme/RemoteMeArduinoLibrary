@@ -1,8 +1,7 @@
 // RemoteMe.h
 
-#include <ArduinoHttpClient.h>
-#include <WebSocketsClient.h>
-#include <Hash.h>
+#include <Arduino.h>
+
 
 
 #ifndef _REMOTEME_MESSAGES_Utils_h
@@ -30,7 +29,7 @@ namespace RemotemeStructures
 	enum LeafDeviceType { LD_OTHER_SOCKET = 1, LD_EXTERNAL_SCRIPT = 2, LD_SERIAL = 3, LD_NRF24 = 4, LD_GPIO = 5 };
 	enum NetworkDeviceType { ND_UNDEFINED = 0, ND_RASPBERRY_PI = 1, ND_ARDUINO = 2 };
 
-	enum SyncMessageType { USER = 0, GET_WEBRTC_CONENCTED_DEVICE_ID = 1, GET_FILES = 2, GET_FILE_CONTENT = 3, SAVE_FILE_CONTENT = 4, REMOVE_FILE = 5, REMOVE_DEVICE_DIRECTORY = 9, GET_FILE_SIZE = 6, RENAME_FILE = 7, GET_CONNECTED_DEVICES = 8 };
+	enum SyncMessageType { USER = 0, GET_WEBRTC_CONENCTED_DEVICE_ID = 1, GET_FILES = 2, GET_FILE_CONTENT = 3, SAVE_FILE_CONTENT = 4, REMOVE_FILE = 5, REMOVE_DEVICE_DIRECTORY = 9, GET_FILE_SIZE = 6, RENAME_FILE = 7, GET_CONNECTED_DEVICES = 8,GET_WEBSOCKET_SERVER_LOCAL=10 };
 	enum SystemMessageType { RESTART = 1, DEVICE_CONNECT_CHANGE = 2 };
 
 
@@ -72,7 +71,7 @@ namespace RemotemeStructures
 		static uint16_t getUserMessage(RemotemeStructures::WSUserMessageSettings renevalWhenFailType, uint16_t receiverDeviceId, uint16_t senderDeviceId, uint16_t messageId, const uint8_t *data, uint16_t length, uint8_t* &payload);
 		static uint16_t getSyncUserMessage(uint16_t receiverDeviceId, uint16_t senderDeviceId, uint64_t messageId, const uint8_t *data, uint16_t length, uint8_t* &payload);
 		static uint16_t getAddDataMessage(uint16_t seriesId, RemotemeStructures::AddDataMessageSetting settings, uint64_t time, double value, uint8_t* &payload);
-		static uint16_t getSyncResponseUserMessage(uint64_t messageId, uint16_t dataSize, uint8_t * data, uint8_t* &payload);
+		static uint16_t getSyncResponseMessage(uint64_t messageId, uint16_t dataSize, uint8_t * data, uint8_t* &payload);
 		static uint16_t getRegisterDeviceMessage(uint16_t deviceId, String deviceName, RemotemeStructures::DeviceType deviceType, RemotemeStructures::NetworkDeviceType networkDeviceType, uint8_t* &payload);
 		static uint16_t getLogMessage(RemotemeStructures::LogLevel logLevel, String str, uint8_t* &payload);
 		static uint16_t getRegisterChildDeviceMessage(uint16_t parentDeviceId, uint16_t deviceId, String deviceName, uint8_t* &payload);

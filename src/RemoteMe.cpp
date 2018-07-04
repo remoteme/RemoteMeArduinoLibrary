@@ -15,7 +15,28 @@
 
 	}
 
+	void RemoteMe::webSocketServerEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
+		static bool zm = true;
 
+		switch (type) {
+		case WStype_DISCONNECTED:
+			
+			break;
+		case WStype_CONNECTED:
+			
+			break;
+		case WStype_TEXT:
+
+			// send message to server
+			// webSocket.sendTXT("message here");
+			break;
+		case WStype_BIN:
+			if (length > 0) {
+				RemoteMe::getInstance("", 0).processMessage(payload);
+			}
+
+		}
+	}
 
 	void RemoteMe::webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
 		static bool zm = true;
@@ -29,7 +50,7 @@
 			RemoteMe::getInstance("", 0).webSocketConnected = true;
 			RemoteMe::getInstance("", 0).webSocket->setReconnectInterval(20000);
 			
-			Serial.print("websocket conencted");
+			
 			break;
 		case WStype_TEXT:
 			
@@ -63,8 +84,7 @@
 			if (rm.onUserMessage != nullptr) {
 				rm.onUserMessage(senderDeviceId, dataSize, data);
 			}
-		}
-		else if (messageType == RemotemeStructures::USER_SYNC_MESSAGE) {
+		}else if (messageType == RemotemeStructures::USER_SYNC_MESSAGE) {
 			uint16_t receiverDeviceId = RemoteMeMessagesUtils::getUint16(payload, pos);
 			uint16_t senderDeviceId = RemoteMeMessagesUtils::getUint16(payload, pos);
 
@@ -79,10 +99,35 @@
 				uint8_t* returnData;
 
 				rm.onUserSyncMessage(senderDeviceId, dataSize, data, returnDataSize, returnData);
-				rm.sendSyncResponseUserMessage(messageId, returnDataSize, returnData);
+				rm.sendSyncResponseMessage(messageId, returnDataSize, returnData);
 
 				free(returnData);
 
+			}
+
+
+		} else if (messageType == RemotemeStructures::SYNC_MESSAGE) {
+			int8_t type = RemoteMeMessagesUtils::getInt8(payload, pos);
+			uint16_t receiverDeviceId = RemoteMeMessagesUtils::getUint16(payload, pos);	
+			uint64_t messageId = RemoteMeMessagesUtils::getInt64(payload, pos);
+			
+			uint16_t dataSize = size - pos + 4;
+			uint8_t* data = RemoteMeMessagesUtils::getArray(payload, pos, dataSize);
+
+			if (type == RemotemeStructures::GET_WEBSOCKET_SERVER_LOCAL) {
+				uint16_t posR = 0;
+				uint16_t returnDataSize = 1 + 2 + 16;
+
+				uint8_t* returnData= (uint8_t*)malloc(returnDataSize);
+				if (webSocketServer==nullptr) {
+					RemoteMeMessagesUtils::putUint8(returnData, posR, 0);
+				}else {
+					RemoteMeMessagesUtils::putUint8(returnData, posR, 1);
+				}
+				RemoteMeMessagesUtils::putUint16(returnData, posR, LOCAL_SERVER_PORT);
+				RemoteMeMessagesUtils::putString(returnData, posR, WiFi.localIP().toString());
+				sendSyncResponseMessage(messageId, returnDataSize, returnData);
+				free(returnData);
 			}
 
 
@@ -240,14 +285,15 @@
 
 	}
 
-	void RemoteMe::sendSyncResponseUserMessage(uint64_t messageId, uint16_t dataSize, uint8_t * dataS)
+
+
+	void RemoteMe::sendSyncResponseMessage(uint64_t messageId, uint16_t dataSize, uint8_t * dataS)
 	{
 		uint8_t* data;
-		uint16_t size=RemoteMeMessagesUtils::getSyncResponseUserMessage(messageId, dataSize, dataS,data);
-		send(data,size);
+		uint16_t size = RemoteMeMessagesUtils::getSyncResponseMessage(messageId, dataSize, dataS, data);
+		send(data, size);
 
 	}
-
 
 	void  RemoteMe::sendRegisterDeviceMessage(uint16_t deviceId, String deviceName, RemotemeStructures::DeviceType deviceType, RemotemeStructures::NetworkDeviceType networkDeviceType) {
 		uint8_t * data;
@@ -403,6 +449,14 @@
 		
 	}
 
+	void RemoteMe::setupDirectConnections( ) {
+	
+
+		webSocketServer = new WebSocketsServer(LOCAL_SERVER_PORT);
+		webSocketServer->begin();
+		webSocketServer->onEvent(RemoteMe::webSocketServerEvent);
+
+	}
 	void RemoteMe::loop() {
 		
 		waitForConnection();
@@ -411,6 +465,9 @@
 		}
 		else if (socketEnabled) {
 			socketLoop();
+		}
+		if (webSocketServer != nullptr) {
+			webSocketServer->loop();
 		}
 
 	}
