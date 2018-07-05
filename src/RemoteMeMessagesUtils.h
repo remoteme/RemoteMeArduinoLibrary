@@ -61,6 +61,7 @@ namespace RemotemeStructures
 		
 		static uint8_t *getArray(uint8_t *data, uint16_t &pos, uint16_t length);
 		static uint16_t getUint16(uint8_t *payload, uint16_t &pos);
+		static int16_t getInt16(uint8_t* payload, uint16_t& pos);
 		static uint32_t getUint32(uint8_t *payload, uint16_t &pos);
 		static uint8_t getUint8(uint8_t* data, uint16_t& pos);
 		static int8_t getInt8(uint8_t* data, uint16_t &pos);

@@ -82,6 +82,18 @@ uint16_t RemoteMeMessagesUtils::getUint16(uint8_t* payload, uint16_t& pos) {
 	return  *ret;
 }
 
+
+int16_t RemoteMeMessagesUtils::getInt16(uint8_t* payload, uint16_t& pos) {
+
+	uint8_t* temp = getArray(payload, pos, sizeof(int16_t));
+
+	temp = getReverseBytes(temp, sizeof(int16_t));
+	pos += sizeof(int16_t);
+	int16_t* ret = (int16_t*)temp;
+	return  *ret;
+
+}
+
 uint32_t RemoteMeMessagesUtils::getUint32(uint8_t *payload, uint16_t& pos) {
 	uint8_t* temp = getArray(payload, pos, sizeof(uint32_t));
 	temp = getReverseBytes(temp, sizeof(uint32_t));
