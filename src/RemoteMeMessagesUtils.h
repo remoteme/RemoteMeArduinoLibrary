@@ -44,7 +44,7 @@ namespace RemotemeStructures
 
 	private:
 		static uint8_t *getReverseBytes(void *start, uint16_t size);
-		
+		static void reverseBytes(uint8_t*  arr, uint16_t size);
 	public:
 	
 		static void putUint16(uint8_t* data, uint16_t &pos, uint16_t number);
