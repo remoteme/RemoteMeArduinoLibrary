@@ -21,12 +21,18 @@
 #endif
 
 #include "RemoteMeMessagesUtils.h"
+
+
+	class Observers;
+
 	class RemoteMe
 	{
 		const char * token;
 		uint16_t deviceId;
 		bool webSocketConnected = false;
 		bool socketConnected = false;
+
+		Observers* observers = nullptr;
 
 		WebSocketsClient* webSocket = nullptr;
 		WebSocketsServer* webSocketServer = nullptr;
@@ -81,7 +87,7 @@
 		void disconnect();
 		void send(uint8_t * payload, uint16_t size);
 		
-
+		uint16_t getDeviceId();
 		void sendAddDataMessage(uint16_t seriesId, RemotemeStructures::AddDataMessageSetting settings, uint64_t time, double value);
 
 		uint16_t sendUserSyncMessage(uint16_t receiverDeviceId, const uint8_t * payload, uint16_t length, uint8_t*& returnData);
@@ -91,6 +97,9 @@
 		void sendUserMessage(RemotemeStructures::WSUserMessageSettings renevalWhenFailType, uint16_t receiverDeviceId, uint16_t senderDeviceId, uint16_t messageId, String message);
 		void sendUserMessage(uint16_t receiverDeviceId, String message);
 		void sendUserMessage(uint16_t receiverDeviceId, const uint8_t * payload, uint16_t length);
+
+		void sendObserverRegisterMessage(String name, uint16_t type);
+
 
 		void sendRegisterDeviceMessage(uint16_t deviceId, String deviceName, RemotemeStructures::DeviceType deviceType, RemotemeStructures::NetworkDeviceType networkDeviceType);
 		void sendRegisterDeviceMessage(String deviceName);
@@ -104,7 +113,12 @@
 		void setUserMessageListener(void(*onUserMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data));
 		void setUserSyncMessageListener(void(*onUserSyncMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t*, uint16_t& returnDataSize, uint8_t*& returnData));
 
-		
+		//------------
+
+
+		Observers* getObservers();
+
+		//-----------
 		String callRest(String restUrl);
 
 

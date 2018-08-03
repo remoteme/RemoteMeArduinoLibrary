@@ -6,7 +6,7 @@
 
 
 #include "RemoteMe.h"
-
+#include "Observers.h"
 
 
 	RemoteMe::RemoteMe(char * token, uint16_t deviceId) {
@@ -135,13 +135,19 @@
 			}
 			free(data);
 
-		}
-		else if (messageType == RemotemeStructures::SYNC_RESPONSE_MESSAGE) {
+		}	else if (messageType == RemotemeStructures::SYNC_RESPONSE_MESSAGE) {
 
 			rm.messageId = RemoteMeMessagesUtils::getInt64(payload, pos);
 
 			//rm.syncResponseData = RemoteMeMessagesUtils::getArray(payload, pos, size);
 			//rm.syncResponseDataSize = size;
+
+
+		}else if (messageType == RemotemeStructures::OBSERVER_CHANGE_PROPAGATE_MESSAGE) {
+
+			if (rm.observers != nullptr) {
+				rm.observers->onChangePropagateMessage(payload);
+			}
 
 
 		}
@@ -525,4 +531,28 @@
 	
 	long RemoteMe::deltaMillis(){
 		return millis()+1e6;//so functions to restart conenciton woutn wait 20s without when first time connect
+	}
+	uint16_t RemoteMe::getDeviceId() {
+		return deviceId;
+
+	}
+
+	//---------- observers
+
+
+	Observers*  RemoteMe::getObservers() {
+		if (this->observers == nullptr) {
+			this->observers = new Observers(this);
+		}
+		return this->observers;
+	}
+
+	void RemoteMe::sendObserverRegisterMessage(String name, uint16_t type) {
+		
+
+		uint8_t* data;
+		uint16_t size = RemoteMeMessagesUtils::getObserverRegisterMessage(deviceId, name, type, data);
+		send(data, size);
+		free(data);
+
 	}

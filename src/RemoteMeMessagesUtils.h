@@ -9,10 +9,17 @@
 
 namespace RemotemeStructures
 {
+	enum VariableOberverType {
+		BOOLEAN=0, INTEGER=1
+	};
+	
 
 	enum MessageType {
 		USER_MESSAGE = 100, USER_MESSAGE_DELIVER_STATUS = 101, USER_SYNC_MESSAGE = 102,
-		SYNC_MESSAGE = 120, SYNC_RESPONSE_MESSAGE = 121, WEBRTC_MESSAGE = 150,
+		OBSERVER_CHANGE_MESSAGE= 103, OBSERVER_CHANGE_PROPAGATE_MESSAGE = 104,
+		SYNC_MESSAGE = 120, SYNC_RESPONSE_MESSAGE = 121, 
+		OBSERVER_REGISTER_MESSAGE =122,
+		WEBRTC_MESSAGE = 150,
 		REGISTER_DEVICE = 200, REGISTER_CHILD_DEVICE = 201, ADD_DATA = 300,
 
 		UPDATEFILE = 400,
@@ -49,11 +56,13 @@ namespace RemotemeStructures
 	
 		static void putUint16(uint8_t* data, uint16_t &pos, uint16_t number);
 		static void putUint8(uint8_t* data, uint16_t &pos, uint8_t number);
+		static void putBoolean(uint8_t* data, uint16_t &pos, boolean val);
 	
 		static void putArray(uint8_t* data, uint16_t &pos, const void* number, uint16_t length);
 		static void putString(uint8_t * data, uint16_t &pos, String string);
 		static void putUint64(uint8_t * data, uint16_t &pos, uint64_t number);
 		static void putUint32(uint8_t * data, uint16_t &pos, uint32_t number);
+		static void putInt32(uint8_t * data, uint16_t &pos, int32_t number);
 		static void putDouble(uint8_t * data, uint16_t &pos, double value);
 		static void putFloat(uint8_t * data, uint16_t &pos, float value);
 		
@@ -63,6 +72,7 @@ namespace RemotemeStructures
 		static uint16_t getUint16(uint8_t *payload, uint16_t &pos);
 		static int16_t getInt16(uint8_t* payload, uint16_t& pos);
 		static uint32_t getUint32(uint8_t *payload, uint16_t &pos);
+		static int32_t getInt32(uint8_t *payload, uint16_t &pos);
 		static uint8_t getUint8(uint8_t* data, uint16_t& pos);
 		static int8_t getInt8(uint8_t* data, uint16_t &pos);
 		static String getString(uint8_t* data, uint16_t& pos);
@@ -76,6 +86,8 @@ namespace RemotemeStructures
 		static uint16_t getRegisterDeviceMessage(uint16_t deviceId, String deviceName, RemotemeStructures::DeviceType deviceType, RemotemeStructures::NetworkDeviceType networkDeviceType, uint8_t* &payload);
 		static uint16_t getLogMessage(RemotemeStructures::LogLevel logLevel, String str, uint8_t* &payload);
 		static uint16_t getRegisterChildDeviceMessage(uint16_t parentDeviceId, uint16_t deviceId, String deviceName, uint8_t* &payload);
+
+		static uint16_t getObserverRegisterMessage(uint16_t deviceId,String name, uint16_t type, uint8_t* &payload);
 	};
 
 

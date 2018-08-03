@@ -12,7 +12,6 @@
 
 
 
-
 void RemoteMeMessagesUtils::putString(uint8_t* data, uint16_t &pos, String string) {
 	const uint8_t* dataString = reinterpret_cast<const uint8_t*>(&string[0]);
 	putArray(data, pos, dataString, string.length());
@@ -29,9 +28,17 @@ void RemoteMeMessagesUtils::putArray(uint8_t* data, uint16_t &pos, const void* a
 
 void RemoteMeMessagesUtils::putUint8(uint8_t* data, uint16_t &pos, uint8_t number) {
 	data[pos++] = number;
-
-
 }
+
+void RemoteMeMessagesUtils::putBoolean(uint8_t* data, uint16_t &pos, boolean value){
+	if (value) {
+		RemoteMeMessagesUtils::putUint8(data, pos, 1);
+	}
+	else {
+		RemoteMeMessagesUtils::putUint8(data, pos, 0);
+	}
+}
+
 
 void RemoteMeMessagesUtils::putUint16(uint8_t* data, uint16_t &pos, uint16_t number) {
 	putBigEndian(data, pos, &number, sizeof(uint16_t));
@@ -43,6 +50,9 @@ void RemoteMeMessagesUtils::putUint64(uint8_t* data, uint16_t &pos, uint64_t num
 
 void RemoteMeMessagesUtils::putUint32(uint8_t* data, uint16_t &pos, uint32_t number) {
 	putBigEndian(data, pos, &number, sizeof(uint32_t));
+}
+void RemoteMeMessagesUtils::putInt32(uint8_t* data, uint16_t &pos, int32_t number) {
+	putBigEndian(data, pos, &number, sizeof(int32_t));
 }
 
 
@@ -96,6 +106,22 @@ int16_t RemoteMeMessagesUtils::getInt16(uint8_t* payload, uint16_t& pos) {
 	pos += sizeof(int16_t);
 	
 	int16_t retX=*((int16_t*)temp);
+	free(temp);
+	return  retX;
+
+}
+
+
+
+
+int32_t RemoteMeMessagesUtils::getInt32(uint8_t* payload, uint16_t& pos) {
+
+	uint8_t* temp = getArray(payload, pos, sizeof(int32_t));
+
+	reverseBytes(temp, sizeof(int32_t));
+	pos += sizeof(int32_t);
+
+	int32_t retX = *((int32_t*)temp);
 	free(temp);
 	return  retX;
 
@@ -310,4 +336,30 @@ uint16_t RemoteMeMessagesUtils::getRegisterChildDeviceMessage(uint16_t parentDev
 
 
 	return size+4;
+}
+
+
+uint16_t RemoteMeMessagesUtils::getObserverRegisterMessage(uint16_t deviceId, String name, uint16_t type, uint8_t* &payload) {
+
+	uint16_t size = 4 + 2 + name.length() + 1;
+
+	payload = (uint8_t*)malloc(size + 4);
+
+
+	uint16_t pos = 0;
+
+
+	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::OBSERVER_REGISTER_MESSAGE);
+	RemoteMeMessagesUtils::putUint16(payload, pos, size);
+
+	RemoteMeMessagesUtils::putUint16(payload, pos, deviceId);
+	RemoteMeMessagesUtils::putUint16(payload, pos, 1);//we sends only one
+
+	RemoteMeMessagesUtils::putUint16(payload, pos, type);
+	RemoteMeMessagesUtils::putString(payload, pos, name);
+
+
+
+	return size + 4;
+
 }
