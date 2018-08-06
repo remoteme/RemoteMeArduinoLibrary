@@ -30,18 +30,21 @@ void RemoteMeMessagesUtils::putUint8(uint8_t* data, uint16_t &pos, uint8_t numbe
 	data[pos++] = number;
 }
 
+void RemoteMeMessagesUtils::putInt8(uint8_t* data, uint16_t &pos, int8_t number) {
+	data[pos++] = number;
+}
+
 void RemoteMeMessagesUtils::putBoolean(uint8_t* data, uint16_t &pos, boolean value){
-	if (value) {
-		RemoteMeMessagesUtils::putUint8(data, pos, 1);
-	}
-	else {
-		RemoteMeMessagesUtils::putUint8(data, pos, 0);
-	}
+	RemoteMeMessagesUtils::putInt8(data, pos, value? 1:0);
 }
 
 
 void RemoteMeMessagesUtils::putUint16(uint8_t* data, uint16_t &pos, uint16_t number) {
 	putBigEndian(data, pos, &number, sizeof(uint16_t));
+}
+
+void RemoteMeMessagesUtils::putInt16(uint8_t* data, uint16_t &pos, int16_t number) {
+	putBigEndian(data, pos, &number, sizeof(int16_t));
 }
 
 void RemoteMeMessagesUtils::putUint64(uint8_t* data, uint16_t &pos, uint64_t number) {

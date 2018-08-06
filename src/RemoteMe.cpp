@@ -238,7 +238,6 @@
 			
 			this->loop();
 			if (this->messageId == messageId) {//got reponse
-				Serial.println(this->syncResponseDataSize);
 				returnData = this->syncResponseData;
 				this->messageId = 0;
 				return this->syncResponseDataSize;

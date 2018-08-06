@@ -10,7 +10,7 @@
 namespace RemotemeStructures
 {
 	enum VariableOberverType {
-		BOOLEAN=0, INTEGER=1
+		BOOLEAN=0, INTEGER=1,TEXT=2,SMALL_INTEGER_3=3,SMALL_INTEGER_2=4,INTEGER_BOOLEAN=5,DOUBLE=6
 	};
 	
 
@@ -55,7 +55,9 @@ namespace RemotemeStructures
 	public:
 	
 		static void putUint16(uint8_t* data, uint16_t &pos, uint16_t number);
+		static void putInt16(uint8_t* data, uint16_t &pos, int16_t number);
 		static void putUint8(uint8_t* data, uint16_t &pos, uint8_t number);
+		static void putInt8(uint8_t* data, uint16_t &pos, int8_t number);
 		static void putBoolean(uint8_t* data, uint16_t &pos, boolean val);
 	
 		static void putArray(uint8_t* data, uint16_t &pos, const void* number, uint16_t length);
