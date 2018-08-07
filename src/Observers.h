@@ -26,11 +26,11 @@
 	};
 	struct SmallInteger3Observer {
 		String name;
-		void(*toCall)(uint16_t , uint16_t , uint16_t );
+		void(*toCall)(int16_t, int16_t, int16_t);
 	};
 	struct SmallInteger2Observer {
 		String name;
-		void(*toCall)(uint16_t , uint16_t );
+		void(*toCall)(int16_t, int16_t);
 	};
 	struct IntegerBooleanObserver {
 		String name;
@@ -68,8 +68,8 @@
 		void observeBoolean(String name,void(*toCall)(boolean));
 		void observeInteger(String name,void(*toCall)(int32_t));
 		void observeText(String name, void(*toCall)(String));
-		void observeSmallInteger3(String name, void(*toCall)(uint16_t, uint16_t, uint16_t));
-		void observeSmallInteger2(String name, void(*toCall)(uint16_t, uint16_t));
+		void observeSmallInteger3(String name, void(*toCall)(int16_t, int16_t, int16_t));
+		void observeSmallInteger2(String name, void(*toCall)(int16_t, int16_t));
 		void observeIntegerBoolean(String name, void(*toCall)(int32_t, boolean));
 		void observeDouble(String name, void(*toCall)(double));
 

@@ -120,7 +120,7 @@ void Observers::observeText(String name, void(*toCall)(String)) {
 
 	this->remoteMe->sendObserverRegisterMessage(name, RemotemeStructures::VariableOberverType::TEXT);
 }
-void Observers::observeSmallInteger3(String name, void(*toCall)(uint16_t, uint16_t, uint16_t)) {
+void Observers::observeSmallInteger3(String name, void(*toCall)(int16_t, int16_t, int16_t)) {
 	SmallInteger3Observer bo;
 	bo.toCall = toCall;
 	bo.name = name;
@@ -128,7 +128,7 @@ void Observers::observeSmallInteger3(String name, void(*toCall)(uint16_t, uint16
 
 	this->remoteMe->sendObserverRegisterMessage(name, RemotemeStructures::VariableOberverType::SMALL_INTEGER_3);
 }
-void Observers::observeSmallInteger2(String name, void(*toCall)(uint16_t, uint16_t)) {
+void Observers::observeSmallInteger2(String name, void(*toCall)(int16_t, int16_t)) {
 	SmallInteger2Observer bo;
 	bo.toCall = toCall;
 	bo.name = name;
@@ -256,7 +256,7 @@ void Observers::setSmallInteger2(String name, uint16_t val1, uint16_t val2, bool
 void Observers::setIntegerBoolean(String name, int32_t val1, boolean val2, boolean ignoreCurrent) {
 	uint8_t* payload;
 	uint16_t pos = 0;
-	uint16_t size = prepareSetMessage(payload, pos, ignoreCurrent, name, RemotemeStructures::VariableOberverType::INTEGER_BOOLEAN, 4);
+	uint16_t size = prepareSetMessage(payload, pos, ignoreCurrent, name, RemotemeStructures::VariableOberverType::INTEGER_BOOLEAN, 5);
 
 
 	RemoteMeMessagesUtils::putInt32(payload, pos, val1);
@@ -270,7 +270,7 @@ void Observers::setIntegerBoolean(String name, int32_t val1, boolean val2, boole
 void Observers::setDouble(String name, double value, boolean ignoreCurrent) {
 	uint8_t* payload;
 	uint16_t pos = 0;
-	uint16_t size = prepareSetMessage(payload, pos, ignoreCurrent, name, RemotemeStructures::VariableOberverType::DOUBLE, 4);
+	uint16_t size = prepareSetMessage(payload, pos, ignoreCurrent, name, RemotemeStructures::VariableOberverType::DOUBLE,8);
 
 
 	RemoteMeMessagesUtils::putDouble(payload, pos, value);

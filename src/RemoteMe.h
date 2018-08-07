@@ -4,6 +4,7 @@
 #include <ArduinoHttpClient.h>
 #include <WebSocketsClient.h>
 #include <WebSocketsServer.h>
+
 #include <Hash.h>
 
 
@@ -12,8 +13,8 @@
 #define _REMOTEME_h
 
 
-#define REMOTEME_HOST "app.remoteme.org"
-#define REMOTEME_HTTP_PORT 80
+#define REMOTEME_HOST "192.168.0.30"
+#define REMOTEME_HTTP_PORT 8082
 
 #define REMOTEME_SOCKET_PORT 18
 #ifndef LOCAL_SERVER_PORT
