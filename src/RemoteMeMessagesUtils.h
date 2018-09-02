@@ -10,15 +10,15 @@
 namespace RemotemeStructures
 {
 	enum VariableOberverType {
-		BOOLEAN=0, INTEGER=1,TEXT=2,SMALL_INTEGER_3=3,SMALL_INTEGER_2=4,INTEGER_BOOLEAN=5,DOUBLE=6
+		BOOLEAN=0, INTEGER=1,TEXT=2,SMALL_INTEGER_3=3,SMALL_INTEGER_2=4,INTEGER_BOOLEAN=5,DOUBLE=6,TEXT_2=7
 	};
 	
 
 	enum MessageType {
 		USER_MESSAGE = 100, USER_MESSAGE_DELIVER_STATUS = 101, USER_SYNC_MESSAGE = 102,
-		OBSERVER_CHANGE_MESSAGE= 103, OBSERVER_CHANGE_PROPAGATE_MESSAGE = 104,
+		VARIABLE_CHANGE_MESSAGE= 103, VARIABLE_CHANGE_PROPAGATE_MESSAGE = 104,
 		SYNC_MESSAGE = 120, SYNC_RESPONSE_MESSAGE = 121, 
-		OBSERVER_REGISTER_MESSAGE =122,
+		VARIABLE_OBSERVE_MESSAGE =122,
 		WEBRTC_MESSAGE = 150,
 		REGISTER_DEVICE = 200, REGISTER_CHILD_DEVICE = 201, ADD_DATA = 300,
 
@@ -89,7 +89,7 @@ namespace RemotemeStructures
 		static uint16_t getLogMessage(RemotemeStructures::LogLevel logLevel, String str, uint8_t* &payload);
 		static uint16_t getRegisterChildDeviceMessage(uint16_t parentDeviceId, uint16_t deviceId, String deviceName, uint8_t* &payload);
 
-		static uint16_t getObserverRegisterMessage(uint16_t deviceId,String name, uint16_t type, uint8_t* &payload);
+		static uint16_t sendVariableObserveMessage(uint16_t deviceId,String name, uint16_t type, uint8_t* &payload);
 	};
 
 

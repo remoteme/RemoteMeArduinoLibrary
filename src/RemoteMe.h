@@ -24,7 +24,7 @@
 #include "RemoteMeMessagesUtils.h"
 
 
-	class Observers;
+	class Variables;
 
 	class RemoteMe
 	{
@@ -33,7 +33,7 @@
 		bool webSocketConnected = false;
 		bool socketConnected = false;
 
-		Observers* observers = nullptr;
+		Variables* variables = nullptr;
 
 		WebSocketsClient* webSocket = nullptr;
 		WebSocketsServer* webSocketServer = nullptr;
@@ -99,7 +99,7 @@
 		void sendUserMessage(uint16_t receiverDeviceId, String message);
 		void sendUserMessage(uint16_t receiverDeviceId, const uint8_t * payload, uint16_t length);
 
-		void sendObserverRegisterMessage(String name, uint16_t type);
+		void sendVariableObserveMessage(String name, uint16_t type);
 
 
 		void sendRegisterDeviceMessage(uint16_t deviceId, String deviceName, RemotemeStructures::DeviceType deviceType, RemotemeStructures::NetworkDeviceType networkDeviceType);
@@ -116,8 +116,9 @@
 
 		//------------
 
-
-		Observers* getObservers();
+		void sendVariableRegisterMessage(String name, uint16_t type);
+	
+		Variables* getVariables();
 
 		//-----------
 		String callRest(String restUrl);

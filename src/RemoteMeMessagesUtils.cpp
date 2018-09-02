@@ -342,7 +342,7 @@ uint16_t RemoteMeMessagesUtils::getRegisterChildDeviceMessage(uint16_t parentDev
 }
 
 
-uint16_t RemoteMeMessagesUtils::getObserverRegisterMessage(uint16_t deviceId, String name, uint16_t type, uint8_t* &payload) {
+uint16_t RemoteMeMessagesUtils::sendVariableObserveMessage(uint16_t deviceId, String name, uint16_t type, uint8_t* &payload) {
 
 	uint16_t size = 4 + 2 + name.length() + 1;
 
@@ -352,7 +352,7 @@ uint16_t RemoteMeMessagesUtils::getObserverRegisterMessage(uint16_t deviceId, St
 	uint16_t pos = 0;
 
 
-	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::OBSERVER_REGISTER_MESSAGE);
+	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::VARIABLE_OBSERVE_MESSAGE);
 	RemoteMeMessagesUtils::putUint16(payload, pos, size);
 
 	RemoteMeMessagesUtils::putUint16(payload, pos, deviceId);

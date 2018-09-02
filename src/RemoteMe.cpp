@@ -6,7 +6,7 @@
 
 
 #include "RemoteMe.h"
-#include "Observers.h"
+#include "Variables.h"
 
 
 	RemoteMe::RemoteMe(char * token, uint16_t deviceId) {
@@ -143,10 +143,10 @@
 			//rm.syncResponseDataSize = size;
 
 
-		}else if (messageType == RemotemeStructures::OBSERVER_CHANGE_PROPAGATE_MESSAGE) {
+		}else if (messageType == RemotemeStructures::VARIABLE_CHANGE_PROPAGATE_MESSAGE) {
 
-			if (rm.observers != nullptr) {
-				rm.observers->onChangePropagateMessage(payload);
+			if (rm.variables != nullptr) {
+				rm.variables->onChangePropagateMessage(payload);
 			}
 
 
@@ -536,21 +536,21 @@
 
 	}
 
-	//---------- observers
+	//---------- variables
 
 
-	Observers*  RemoteMe::getObservers() {
-		if (this->observers == nullptr) {
-			this->observers = new Observers(this);
+	Variables*  RemoteMe::getVariables() {
+		if (this->variables == nullptr) {
+			this->variables = new Variables(this);
 		}
-		return this->observers;
+		return this->variables;
 	}
 
-	void RemoteMe::sendObserverRegisterMessage(String name, uint16_t type) {
+	void RemoteMe::sendVariableObserveMessage(String name, uint16_t type) {
 		
 
 		uint8_t* data;
-		uint16_t size = RemoteMeMessagesUtils::getObserverRegisterMessage(deviceId, name, type, data);
+		uint16_t size = RemoteMeMessagesUtils::sendVariableObserveMessage(deviceId, name, type, data);
 		send(data, size);
 		free(data);
 

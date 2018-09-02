@@ -5,54 +5,58 @@
 #include "RemoteMeMessagesUtils.h"
 
 
-#ifndef _REMOTEME_OBSERVERS_h
-#define _REMOTEME_OBSERVERS_h
+#ifndef _REMOTEME_VARIABLES_h
+#define _REMOTEME_VARIABLES_h
 
 
 #include <list>
 
 
-	struct BooleanObserver {
+	struct BooleanVariable {
 		String name;
 		void(*toCall)(boolean);
 	};
-	struct IntegerObserver {
+	struct IntegerVariable {
 		String name;
 		void(*toCall)(int32_t);
 	};
-	struct TextObserver {
+	struct TextVariable {
 		String name;
 		void(*toCall)(String);
 	};
-	struct SmallInteger3Observer {
+	struct SmallInteger3Variable {
 		String name;
 		void(*toCall)(int16_t, int16_t, int16_t);
 	};
-	struct SmallInteger2Observer {
+	struct SmallInteger2Variable {
 		String name;
 		void(*toCall)(int16_t, int16_t);
 	};
-	struct IntegerBooleanObserver {
+	struct IntegerBooleanVariable {
 		String name;
 		void(*toCall)(int32_t, boolean);
 	};
-	struct DoubleObserver {
+	struct DoubleVariable {
 		String name;
 		void(*toCall)(double);
 	};
+	struct Text2Variable {
+		String name;
+		void(*toCall)(String,String);
+	};
 
-
-	class Observers
+	class Variables
 	{
 		friend RemoteMe;
 
-		std::list<BooleanObserver> booleanObservers;
-		std::list<IntegerObserver> integerObservers;
-		std::list<TextObserver> textObservers;
-		std::list<SmallInteger3Observer> smallInteger3Observers;
-		std::list<SmallInteger2Observer> smallInteger2Observers;
-		std::list<IntegerBooleanObserver> integerBooleanObservers;
-		std::list<DoubleObserver> doubleObservers;
+		std::list<BooleanVariable> booleanVariables;
+		std::list<IntegerVariable> integerVariables;
+		std::list<TextVariable> textVariables;
+		std::list<SmallInteger3Variable> smallInteger3Variables;
+		std::list<SmallInteger2Variable> smallInteger2Variables;
+		std::list<IntegerBooleanVariable> integerBooleanVariables;
+		std::list<DoubleVariable> doubleVariables;
+		std::list<Text2Variable> text2Variables;
 
 		
 
@@ -63,7 +67,7 @@
 	protected:
 		void onChangePropagateMessage(uint8_t *payload);
 	public:
-		Observers(RemoteMe* remoteMe);
+		Variables(RemoteMe* remoteMe);
 	
 		void observeBoolean(String name,void(*toCall)(boolean));
 		void observeInteger(String name,void(*toCall)(int32_t));
