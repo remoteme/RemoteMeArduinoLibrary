@@ -129,6 +129,15 @@ void Variables::observeText(String name, void(*toCall)(String)) {
 
 	this->remoteMe->sendVariableObserveMessage(name, RemotemeStructures::VariableOberverType::TEXT);
 }
+
+void Variables::observeText2(String name, void(*toCall)(String,String)) {
+	Text2Variable bo;
+	bo.toCall = toCall;
+	bo.name = name;
+	this->text2Variables.push_back(bo);
+
+	this->remoteMe->sendVariableObserveMessage(name, RemotemeStructures::VariableOberverType::TEXT_2);
+}
 void Variables::observeSmallInteger3(String name, void(*toCall)(int16_t, int16_t, int16_t)) {
 	SmallInteger3Variable bo;
 	bo.toCall = toCall;
@@ -235,6 +244,18 @@ void Variables::setText(String name, String value, boolean ignoreCurrent) {
 	free(payload);
 }
 
+void Variables::setText2(String name, String value1, String value2, boolean ignoreCurrent){
+	uint8_t* payload;
+	uint16_t pos = 0;
+	uint16_t size = prepareSetMessage(payload, pos, ignoreCurrent, name, RemotemeStructures::VariableOberverType::TEXT_2, value1.length()+1+value2.length()+1);
+
+
+	RemoteMeMessagesUtils::putString(payload, pos, value1);
+	RemoteMeMessagesUtils::putString(payload, pos, value2);
+	
+	remoteMe->send(payload, size + 4);
+	free(payload);
+}
 void Variables::setSmallInteger3(String name, uint16_t val1, uint16_t val2, uint16_t val3, boolean ignoreCurrent) {
 	uint8_t* payload;
 	uint16_t pos = 0;

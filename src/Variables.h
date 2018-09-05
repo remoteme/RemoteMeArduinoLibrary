@@ -72,6 +72,7 @@
 		void observeBoolean(String name,void(*toCall)(boolean));
 		void observeInteger(String name,void(*toCall)(int32_t));
 		void observeText(String name, void(*toCall)(String));
+		void observeText2(String name, void(*toCall)(String,String));
 		void observeSmallInteger3(String name, void(*toCall)(int16_t, int16_t, int16_t));
 		void observeSmallInteger2(String name, void(*toCall)(int16_t, int16_t));
 		void observeIntegerBoolean(String name, void(*toCall)(int32_t, boolean));
@@ -86,6 +87,10 @@
 		void setText(String name, String value, boolean ignoreCurrent);
 		inline void setText(String name, String value) { setText(name, value, false); }
 
+		void setText2(String name, String value1, String value2, boolean ignoreCurrent);
+		inline void setText2(String name, String value1, String value2) { setText2(name, value1,value2, false); }
+
+		
 		void setSmallInteger3(String name, uint16_t val1, uint16_t val2, uint16_t val3, boolean ignoreCurrent);
 		inline void setSmallInteger3(String name, uint16_t val1, uint16_t val2, uint16_t val3) { setSmallInteger3(name, val1, val2, val3, false); }
 
