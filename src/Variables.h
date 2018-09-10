@@ -1,6 +1,7 @@
-// RemoteMe.h
+// Variables.h
 
 #include <Arduino.h>
+#include <list>
 #include "RemoteMe.h"
 #include "RemoteMeMessagesUtils.h"
 
@@ -9,7 +10,8 @@
 #define _REMOTEME_VARIABLES_h
 
 
-#include <list>
+
+	class RemoteMe;
 
 
 	struct BooleanVariable {

@@ -15,58 +15,8 @@
 
 	}
 
-	void RemoteMe::webSocketServerEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
-		static bool zm = true;
+	
 
-		switch (type) {
-		case WStype_DISCONNECTED:
-			
-			break;
-		case WStype_CONNECTED:
-			
-			break;
-		case WStype_TEXT:
-
-			// send message to server
-			// webSocket.sendTXT("message here");
-			break;
-		case WStype_BIN:
-			if (length > 0) {
-				RemoteMe::getInstance("", 0).processMessage(payload);
-			}
-
-		}
-		
-	}
-
-	void RemoteMe::webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
-		static bool zm = true;
-
-		switch (type) {
-		case WStype_DISCONNECTED:
-			//Serial.print("disConnected web socket");
-			RemoteMe::getInstance("", 0).webSocketConnected = false;
-			break;
-		case WStype_CONNECTED:
-			RemoteMe::getInstance("", 0).webSocketConnected = true;
-			RemoteMe::getInstance("", 0).webSocket->setReconnectInterval(20000);
-			
-			
-			break;
-		case WStype_TEXT:
-			
-			// send message to server
-			// webSocket.sendTXT("message here");
-			break;
-		case WStype_BIN:
-			if (length > 0) {
-				RemoteMe::getInstance("", 0).processMessage(payload);
-			}
-			
-		}
-		
-		
-	}
 
 
 	void RemoteMe::processMessage(uint8_t *payload) {
@@ -123,11 +73,15 @@
 				uint16_t returnDataSize = 1 + 2 + 16;
 
 				uint8_t* returnData= (uint8_t*)malloc(returnDataSize);
-				if (webSocketServer==nullptr) {
+				#ifdef DIRECT_CONNECTIONS
+					if (webSocketServer==nullptr) {
+						RemoteMeMessagesUtils::putUint8(returnData, posR, 0);
+					}else {
+						RemoteMeMessagesUtils::putUint8(returnData, posR, 1);
+					}
+				#else
 					RemoteMeMessagesUtils::putUint8(returnData, posR, 0);
-				}else {
-					RemoteMeMessagesUtils::putUint8(returnData, posR, 1);
-				}
+				#endif
 				RemoteMeMessagesUtils::putUint16(returnData, posR, LOCAL_SERVER_PORT);
 				RemoteMeMessagesUtils::putString(returnData, posR, WiFi.localIP().toString());
 				sendSyncResponseMessage(messageId, returnDataSize, returnData);
@@ -155,7 +109,7 @@
 			//Serial.println("message type  is not supported");
 		}
 	}
-	
+	#ifdef  REST_CONNECTIONS
 	String RemoteMe::callRest(String restUrl){
 		HttpClient* httpClient;
 		if (httpClient == nullptr) {
@@ -211,16 +165,15 @@
 
 
 	}
+	
+	#endif
+	
 	void RemoteMe::setupTwoWayCommunication() {
 		
 		socketEnabled = true;
 		waitForConnection();
 	}
-	void RemoteMe::setupTwoWayWebSocketCommunication() {
-		webSocketEnabled = true;
-		waitForConnection();
-	}
-	
+
 	
 	uint16_t RemoteMe::sendUserSyncMessage(uint16_t receiverDeviceId, const uint8_t * payload, uint16_t length, uint8_t*& returnData) {
 
@@ -315,13 +268,13 @@
 	void RemoteMe::send(uint8_t * payload,uint16_t size ) {
 	
 
-		if (webSocketConnected) {
-			webSocket->sendBIN(payload, size);
-		}else if (socketConnected) {
+		if (socketConnected) {
 			wifiClient->write((unsigned char*)payload, size);
 		}
 		else {
+			#ifdef  REST_CONNECTIONS
 			sendByRest(payload, size);
+			#endif
 		}
 	
 	}
@@ -377,11 +330,7 @@
 
 	bool RemoteMe::ping() {
 		bool ret = false;
-		if (webSocketEnabled) {
-			if (webSocketConnected) {
-				ret = webSocket->sendPing();
-			}
-		}else if (socketEnabled) {
+		if (socketEnabled) {
 			if (socketConnected) {
 				uint8_t *buffer = (uint8_t*)malloc(4);
 				buffer[0] = 0;
@@ -395,7 +344,6 @@
 		
 		if (!ret) {
 			socketConnected = false;
-			webSocketConnected = false;
 		}
 		return ret;
 	}
@@ -404,33 +352,17 @@
 		static unsigned long lastTimePing = 0;
 		static unsigned long lastTimeRestart = 0;
 
-		if (webSocketEnabled || socketEnabled) {
+		if (socketEnabled) {
 			if (lastTimePing + 20000 < deltaMillis()) {
 				ping();
 
 				lastTimePing = deltaMillis();
 			}
-			while (!(socketConnected || webSocketConnected)) {
+			while (!socketConnected) {
 
 				if (lastTimeRestart + 20000 < deltaMillis()) {//restart every 20s
 					lastTimeRestart = deltaMillis();
-					if (webSocketEnabled) {
-						if (webSocket != nullptr) {
-							webSocket->disconnect();
-						}
-						webSocket = new WebSocketsClient();
-
-						char* buf = new char[20];
-						snprintf(buf, 20, "/api/ws/v1/%d", deviceId);
-
-						webSocket->begin(REMOTEME_HOST, REMOTEME_HTTP_PORT, buf, "as");
-						webSocket->setAuthorization("token", token); // HTTP Basic Authorization
-
-						webSocket->setReconnectInterval(500);
-						webSocket->onEvent(RemoteMe::webSocketEvent);
-
-					}
-					else if (socketEnabled) {
+					if (socketEnabled) {
 						if (wifiClient != nullptr) {
 							wifiClient->stop();
 						}
@@ -450,16 +382,39 @@
 						}
 					}
 				}
-				if (webSocketEnabled && webSocket != nullptr) {
-					webSocket->sendPing();
-					webSocket->loop();//its setting  webSocketConnected
-				}
+				
 				delay(100);
 			}
 		}
 		
 	}
 
+	#ifdef DIRECT_CONNECTIONS
+	void RemoteMe::webSocketServerEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
+		static bool zm = true;
+
+		switch (type) {
+		case WStype_DISCONNECTED:
+			
+			break;
+		case WStype_CONNECTED:
+			
+			break;
+		case WStype_TEXT:
+
+			// send message to server
+			// webSocket.sendTXT("message here");
+			break;
+		case WStype_BIN:
+			if (length > 0) {
+				RemoteMe::getInstance("", 0).processMessage(payload);
+			}
+
+		}
+		
+	}
+
+	
 	void RemoteMe::setupDirectConnections( ) {
 	
 
@@ -468,19 +423,19 @@
 		webSocketServer->onEvent(RemoteMe::webSocketServerEvent);
 
 	}
+	#endif
+	
 	void RemoteMe::loop() {
 		
 		waitForConnection();
-		if (webSocketEnabled) {
-			webSocket->loop();
-		}
-		else if (socketEnabled) {
+		if (socketEnabled) {
 			socketLoop();
 		}
+		#ifdef DIRECT_CONNECTIONS
 		if (webSocketServer != nullptr) {
 			webSocketServer->loop();
 		}
-
+		#endif
 	}
 
 
@@ -518,10 +473,7 @@
 		}
 	}
 	void RemoteMe::disconnect() {
-		if (webSocket != nullptr) {
-			webSocket->disconnect();
-			webSocket=nullptr;
-		}
+		
 		if (wifiClient != nullptr) {
 			wifiClient->stop();
 			wifiClient=nullptr;

@@ -4,10 +4,8 @@
 #define DEVICE_NAME ""
 #define TOKEN ""
 
-#include <ArduinoHttpClient.h>
 #include <RemoteMe.h>
 #include <ESP8266WiFi.h>
-
 #include <ESP8266WiFiMulti.h>
 
 
