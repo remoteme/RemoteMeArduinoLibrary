@@ -97,7 +97,22 @@ void Variables::onChangePropagateMessage(uint8_t *payload) {
 					break;
 				}
 			}
+		}else if (type == RemotemeStructures::VariableOberverType::SMALL_INTEGER_2_TEXT_2) {
+			
+			uint16_t val1 = RemoteMeMessagesUtils::getInt16(payload, pos);
+			uint16_t val2 = RemoteMeMessagesUtils::getInt16(payload, pos);
+
+			String val3 =RemoteMeMessagesUtils::getString(payload, pos);
+			String val4 =RemoteMeMessagesUtils::getString(payload, pos);
+			for (std::list<SmallInteger2Text2Variable>::iterator it = this->smallInteger2Text2Variables.begin(); it != this->smallInteger2Text2Variables.end(); ++it) {
+				if ((*it).name == name) {
+					(*it).toCall(val1, val2,val3,val4);
+					break;
+				}
+			}
 		}
+		
+		
 	}
 }
 void Variables::observeBoolean(String name,void(*toCall)(boolean)) {
@@ -171,7 +186,15 @@ void Variables::observeDouble(String name, void(*toCall)(double)) {
 	this->remoteMe->sendVariableObserveMessage(name, RemotemeStructures::VariableOberverType::DOUBLE);
 }
 
+void Variables::observeSmallInteger2Text2(String name, void(*toCall)(int16_t, int16_t,String,String)){
+	SmallInteger2Text2Variable bo;
+	bo.toCall = toCall;
+	bo.name = name;
+	this->smallInteger2Text2Variables.push_back(bo);
 
+	this->remoteMe->sendVariableObserveMessage(name, RemotemeStructures::VariableOberverType::SMALL_INTEGER_2_TEXT_2);
+}
+		
 uint16_t Variables::prepareSetMessage(uint8_t* &payload, uint16_t &pos, boolean ignoreCurrent, String name, uint16_t type, uint8_t additionalSize) {
 	uint16_t size = 5 + name.length() +1+2 + additionalSize;
 
@@ -310,3 +333,21 @@ void Variables::setDouble(String name, double value, boolean ignoreCurrent) {
 	free(payload);
 
 }
+
+void Variables::setSmallInteger2Text2(String name, int16_t val1, int16_t val2,String val3,String val4, boolean ignoreCurrent) {
+	uint8_t* payload;
+	uint16_t pos = 0;
+	uint16_t size = prepareSetMessage(payload, pos, ignoreCurrent, name, RemotemeStructures::VariableOberverType::SMALL_INTEGER_2_TEXT_2,4+ val3.length()+1+val4.length()+1);
+
+
+	RemoteMeMessagesUtils::putInt16(payload, pos, val1);
+	RemoteMeMessagesUtils::putInt16(payload, pos, val2);
+	RemoteMeMessagesUtils::putString(payload, pos, val3);
+	RemoteMeMessagesUtils::putString(payload, pos, val4);
+	
+
+	remoteMe->send(payload, size + 4);
+	free(payload);
+
+}
+		

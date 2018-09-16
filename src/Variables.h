@@ -46,7 +46,10 @@
 		String name;
 		void(*toCall)(String,String);
 	};
-
+	struct SmallInteger2Text2Variable {
+		String name;
+		void(*toCall)(int16_t, int16_t,String,String);
+	};
 	class Variables
 	{
 		friend RemoteMe;
@@ -59,6 +62,7 @@
 		std::list<IntegerBooleanVariable> integerBooleanVariables;
 		std::list<DoubleVariable> doubleVariables;
 		std::list<Text2Variable> text2Variables;
+		std::list<SmallInteger2Text2Variable> smallInteger2Text2Variables;
 
 		
 
@@ -79,7 +83,8 @@
 		void observeSmallInteger2(String name, void(*toCall)(int16_t, int16_t));
 		void observeIntegerBoolean(String name, void(*toCall)(int32_t, boolean));
 		void observeDouble(String name, void(*toCall)(double));
-
+		void observeSmallInteger2Text2(String name, void(*toCall)(int16_t, int16_t,String,String));
+		
 		void setBoolean(String name,boolean value, boolean ignoreCurrent);
 		inline void setBoolean(String name, boolean value) {setBoolean(name, value, false);	}
 
@@ -104,6 +109,9 @@
 
 		void setDouble(String name, double value, boolean ignoreCurrent);
 		inline void setDouble(String name, double value) { setDouble(name, value, false); }
+		
+		void setSmallInteger2Text2(String name, int16_t val1, int16_t val2,String val3,String val4, boolean ignoreCurrent);
+		inline void setSmallInteger2Text2Variable(String name, int16_t val1, int16_t val2,String val3,String val4) { setSmallInteger2Text2(name, val1,val2,val3,val4, false); }
 	};
 
 

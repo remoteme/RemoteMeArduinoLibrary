@@ -35,7 +35,7 @@ void setup()
 
 	remoteMe.setupTwoWayCommunication();
 	remoteMe.sendRegisterDeviceMessage(DEVICE_NAME);
-	remoteMe.setupDirectConnections();
+	//remoteMe.setupDirectConnections();
 	
 }
 
