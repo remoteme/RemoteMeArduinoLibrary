@@ -111,7 +111,7 @@
 		inline void setDouble(String name, double value) { setDouble(name, value, false); }
 		
 		void setSmallInteger2Text2(String name, int16_t val1, int16_t val2,String val3,String val4, boolean ignoreCurrent);
-		inline void setSmallInteger2Text2Variable(String name, int16_t val1, int16_t val2,String val3,String val4) { setSmallInteger2Text2(name, val1,val2,val3,val4, false); }
+		inline void setSmallInteger2Text2(String name, int16_t val1, int16_t val2,String val3,String val4) { setSmallInteger2Text2(name, val1,val2,val3,val4, false); }
 	};
 
 
