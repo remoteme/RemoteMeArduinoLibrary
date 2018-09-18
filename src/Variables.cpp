@@ -115,14 +115,145 @@ void Variables::onChangePropagateMessage(uint8_t *payload) {
 		
 	}
 }
+
+
+	uint16_t Variables::getVariableObserveMessage(uint8_t* &payload) {
+
+		uint16_t size = 4;
+		uint16_t variablesCount = 0;
+		
+		for (std::list<BooleanVariable>::iterator it = this->booleanVariables.begin(); it != this->booleanVariables.end(); ++it) {
+			size += 2 + (*it).name.length() + 1;
+			variablesCount++;
+		}
+
+		for (std::list<IntegerVariable>::iterator it = this->integerVariables.begin(); it != this->integerVariables.end(); ++it) {
+			size += 2 + (*it).name.length() + 1;
+			variablesCount++;
+		}
+
+		for (std::list<TextVariable>::iterator it = this->textVariables.begin(); it != this->textVariables.end(); ++it) {
+			size += 2 + (*it).name.length() + 1;
+			variablesCount++;
+		}
+
+
+		for (std::list<SmallInteger3Variable>::iterator it = this->smallInteger3Variables.begin(); it != this->smallInteger3Variables.end(); ++it) {
+			size += 2 + (*it).name.length() + 1;
+			variablesCount++;
+		}
+
+		for (std::list<SmallInteger2Variable>::iterator it = this->smallInteger2Variables.begin(); it != this->smallInteger2Variables.end(); ++it) {
+			size += 2 + (*it).name.length() + 1;
+			variablesCount++;
+		}
+
+
+		for (std::list<IntegerBooleanVariable>::iterator it = this->integerBooleanVariables.begin(); it != this->integerBooleanVariables.end(); ++it) {
+			size += 2 + (*it).name.length() + 1;
+			variablesCount++;
+		}
+
+
+		for (std::list<DoubleVariable>::iterator it = this->doubleVariables.begin(); it != this->doubleVariables.end(); ++it) {
+			size += 2 + (*it).name.length() + 1;
+			variablesCount++;
+		}
+
+
+		for (std::list<Text2Variable>::iterator it = this->text2Variables.begin(); it != this->text2Variables.end(); ++it) {
+			size += 2 + (*it).name.length() + 1;
+			variablesCount++;
+		}
+
+
+		for (std::list<SmallInteger2Text2Variable>::iterator it = this->smallInteger2Text2Variables.begin(); it != this->smallInteger2Text2Variables.end(); ++it) {
+			size += 2 + (*it).name.length() + 1;
+			variablesCount++;
+		}
+
+
+		payload = (uint8_t*)malloc(size + 4);
+
+
+		uint16_t pos = 0;
+
+
+		RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::VARIABLE_OBSERVE_MESSAGE);
+		RemoteMeMessagesUtils::putUint16(payload, pos, size);
+
+
+
+		RemoteMeMessagesUtils::putUint16(payload, pos, remoteMe->getDeviceId());
+		RemoteMeMessagesUtils::putUint16(payload, pos, variablesCount);
+
+
+
+		for (std::list<BooleanVariable>::iterator it = this->booleanVariables.begin(); it != this->booleanVariables.end(); ++it) {
+			RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::VariableOberverType::BOOLEAN);
+			RemoteMeMessagesUtils::putString(payload, pos, (*it).name);
+		}
+
+		for (std::list<IntegerVariable>::iterator it = this->integerVariables.begin(); it != this->integerVariables.end(); ++it) {
+			RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::VariableOberverType::INTEGER);
+			RemoteMeMessagesUtils::putString(payload, pos, (*it).name);
+		}
+
+		for (std::list<TextVariable>::iterator it = this->textVariables.begin(); it != this->textVariables.end(); ++it) {
+			RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::VariableOberverType::TEXT);
+			RemoteMeMessagesUtils::putString(payload, pos, (*it).name);
+		}
+
+
+		for (std::list<SmallInteger3Variable>::iterator it = this->smallInteger3Variables.begin(); it != this->smallInteger3Variables.end(); ++it) {
+			RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::VariableOberverType::SMALL_INTEGER_3);
+			RemoteMeMessagesUtils::putString(payload, pos, (*it).name);
+		}
+
+		for (std::list<SmallInteger2Variable>::iterator it = this->smallInteger2Variables.begin(); it != this->smallInteger2Variables.end(); ++it) {
+			RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::VariableOberverType::SMALL_INTEGER_2);
+			RemoteMeMessagesUtils::putString(payload, pos, (*it).name);
+		}
+
+
+		for (std::list<IntegerBooleanVariable>::iterator it = this->integerBooleanVariables.begin(); it != this->integerBooleanVariables.end(); ++it) {
+			RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::VariableOberverType::INTEGER_BOOLEAN);
+			RemoteMeMessagesUtils::putString(payload, pos, (*it).name);
+		}
+
+
+		for (std::list<DoubleVariable>::iterator it = this->doubleVariables.begin(); it != this->doubleVariables.end(); ++it) {
+			RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::VariableOberverType::DOUBLE);
+			RemoteMeMessagesUtils::putString(payload, pos, (*it).name);
+		}
+
+
+		for (std::list<Text2Variable>::iterator it = this->text2Variables.begin(); it != this->text2Variables.end(); ++it) {
+			RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::VariableOberverType::TEXT_2);
+			RemoteMeMessagesUtils::putString(payload, pos, (*it).name);
+		}
+
+
+		for (std::list<SmallInteger2Text2Variable>::iterator it = this->smallInteger2Text2Variables.begin(); it != this->smallInteger2Text2Variables.end(); ++it) {
+			RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::VariableOberverType::SMALL_INTEGER_2_TEXT_2);
+			RemoteMeMessagesUtils::putString(payload, pos, (*it).name);
+		}
+
+	
+
+
+		return size + 4;
+
+
+	
+
+}
+
 void Variables::observeBoolean(String name,void(*toCall)(boolean)) {
 	BooleanVariable bo;
 	bo.toCall = toCall;
 	bo.name = name;
 	this->booleanVariables.push_back(bo);
-
-	this->remoteMe->sendVariableObserveMessage(name, RemotemeStructures::VariableOberverType::BOOLEAN);
-
 }
 
 void Variables::observeInteger(String name, void(*toCall)(int32_t)) {
@@ -130,8 +261,6 @@ void Variables::observeInteger(String name, void(*toCall)(int32_t)) {
 	bo.toCall = toCall;
 	bo.name = name;
 	this->integerVariables.push_back(bo);
-
-	this->remoteMe->sendVariableObserveMessage(name, RemotemeStructures::VariableOberverType::INTEGER);
 
 }
 
@@ -142,7 +271,6 @@ void Variables::observeText(String name, void(*toCall)(String)) {
 	bo.name = name;
 	this->textVariables.push_back(bo);
 
-	this->remoteMe->sendVariableObserveMessage(name, RemotemeStructures::VariableOberverType::TEXT);
 }
 
 void Variables::observeText2(String name, void(*toCall)(String,String)) {
@@ -151,7 +279,6 @@ void Variables::observeText2(String name, void(*toCall)(String,String)) {
 	bo.name = name;
 	this->text2Variables.push_back(bo);
 
-	this->remoteMe->sendVariableObserveMessage(name, RemotemeStructures::VariableOberverType::TEXT_2);
 }
 void Variables::observeSmallInteger3(String name, void(*toCall)(int16_t, int16_t, int16_t)) {
 	SmallInteger3Variable bo;
@@ -159,7 +286,6 @@ void Variables::observeSmallInteger3(String name, void(*toCall)(int16_t, int16_t
 	bo.name = name;
 	this->smallInteger3Variables.push_back(bo);
 
-	this->remoteMe->sendVariableObserveMessage(name, RemotemeStructures::VariableOberverType::SMALL_INTEGER_3);
 }
 void Variables::observeSmallInteger2(String name, void(*toCall)(int16_t, int16_t)) {
 	SmallInteger2Variable bo;
@@ -167,7 +293,6 @@ void Variables::observeSmallInteger2(String name, void(*toCall)(int16_t, int16_t
 	bo.name = name;
 	this->smallInteger2Variables.push_back(bo);
 
-	this->remoteMe->sendVariableObserveMessage(name, RemotemeStructures::VariableOberverType::SMALL_INTEGER_2);
 }
 void Variables::observeIntegerBoolean(String name, void(*toCall)(int32_t, boolean)) {
 	IntegerBooleanVariable bo;
@@ -175,7 +300,6 @@ void Variables::observeIntegerBoolean(String name, void(*toCall)(int32_t, boolea
 	bo.name = name;
 	this->integerBooleanVariables.push_back(bo);
 
-	this->remoteMe->sendVariableObserveMessage(name, RemotemeStructures::VariableOberverType::INTEGER_BOOLEAN);
 }
 void Variables::observeDouble(String name, void(*toCall)(double)) {
 	DoubleVariable bo;
@@ -183,7 +307,6 @@ void Variables::observeDouble(String name, void(*toCall)(double)) {
 	bo.name = name;
 	this->doubleVariables.push_back(bo);
 
-	this->remoteMe->sendVariableObserveMessage(name, RemotemeStructures::VariableOberverType::DOUBLE);
 }
 
 void Variables::observeSmallInteger2Text2(String name, void(*toCall)(int16_t, int16_t,String,String)){
@@ -192,9 +315,11 @@ void Variables::observeSmallInteger2Text2(String name, void(*toCall)(int16_t, in
 	bo.name = name;
 	this->smallInteger2Text2Variables.push_back(bo);
 
-	this->remoteMe->sendVariableObserveMessage(name, RemotemeStructures::VariableOberverType::SMALL_INTEGER_2_TEXT_2);
 }
-		
+
+
+
+
 uint16_t Variables::prepareSetMessage(uint8_t* &payload, uint16_t &pos, boolean ignoreCurrent, String name, uint16_t type, uint8_t additionalSize) {
 	uint16_t size = 5 + name.length() +1+2 + additionalSize;
 

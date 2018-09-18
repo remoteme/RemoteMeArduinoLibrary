@@ -342,27 +342,3 @@ uint16_t RemoteMeMessagesUtils::getRegisterChildDeviceMessage(uint16_t parentDev
 }
 
 
-uint16_t RemoteMeMessagesUtils::sendVariableObserveMessage(uint16_t deviceId, String name, uint16_t type, uint8_t* &payload) {
-
-	uint16_t size = 4 + 2 + name.length() + 1;
-
-	payload = (uint8_t*)malloc(size + 4);
-
-
-	uint16_t pos = 0;
-
-
-	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::VARIABLE_OBSERVE_MESSAGE);
-	RemoteMeMessagesUtils::putUint16(payload, pos, size);
-
-	RemoteMeMessagesUtils::putUint16(payload, pos, deviceId);
-	RemoteMeMessagesUtils::putUint16(payload, pos, 1);//we sends only one
-
-	RemoteMeMessagesUtils::putUint16(payload, pos, type);
-	RemoteMeMessagesUtils::putString(payload, pos, name);
-
-
-
-	return size + 4;
-
-}

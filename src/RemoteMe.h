@@ -12,6 +12,8 @@
 
 #include <functional>
 
+#define PING_SEND 40000
+#define PING_RECEIVE_TIMEOUT 80000
 
 #define NETWORK_ESP8266_ASYNC   (0)
 #define NETWORK_ESP8266         (1)
@@ -161,7 +163,7 @@
 		bool socketEnabled = false;
 
 		RemoteMe(char * token, uint16_t deviceId);
-
+		long lastTimePingReceived;
 		
 		void socketLoop();
 
@@ -174,9 +176,11 @@
 		void sendSyncResponseMessage(uint64_t messageId, uint16_t dataSize, uint8_t* data);
 
 
-		bool ping();
+		void ping();
 		void waitForConnection();
 		long deltaMillis();
+
+		void sendVariableObserveMessage();
 	protected:
 		#ifdef  REST_CONNECTIONS
 		void sendByRest(uint8_t * payload, uint16_t length);
@@ -215,8 +219,7 @@
 		void sendUserMessage(uint16_t receiverDeviceId, String message);
 		void sendUserMessage(uint16_t receiverDeviceId, const uint8_t * payload, uint16_t length);
 
-		void sendVariableObserveMessage(String name, uint16_t type);
-
+		
 
 		void sendRegisterDeviceMessage(uint16_t deviceId, String deviceName, RemotemeStructures::DeviceType deviceType, RemotemeStructures::NetworkDeviceType networkDeviceType);
 		void sendRegisterDeviceMessage(String deviceName);

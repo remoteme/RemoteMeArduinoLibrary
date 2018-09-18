@@ -89,7 +89,7 @@ namespace RemotemeStructures
 		static uint16_t getLogMessage(RemotemeStructures::LogLevel logLevel, String str, uint8_t* &payload);
 		static uint16_t getRegisterChildDeviceMessage(uint16_t parentDeviceId, uint16_t deviceId, String deviceName, uint8_t* &payload);
 
-		static uint16_t sendVariableObserveMessage(uint16_t deviceId,String name, uint16_t type, uint8_t* &payload);
+	
 	};
 
 

@@ -13,6 +13,10 @@
 
 	class RemoteMe;
 
+	struct VariableIdentifier {
+		uint16_t type;
+		String name;
+	};
 
 	struct BooleanVariable {
 		String name;
@@ -72,6 +76,8 @@
 		uint16_t prepareSetMessage(uint8_t* &payload, uint16_t &pos, boolean ignoreCurrent, String name, uint16_t type, uint8_t additionalSize);
 	protected:
 		void onChangePropagateMessage(uint8_t *payload);
+		uint16_t getVariableObserveMessage( uint8_t* &payload);
+
 	public:
 		Variables(RemoteMe* remoteMe);
 	
