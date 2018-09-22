@@ -324,7 +324,15 @@
 	}
 
 
-
+	bool RemoteMe::isSocketConnected(){
+		if (!socketConnected){
+			return false;
+		}
+		if (this->wifiClient==nullptr){
+			return false;
+		}
+		return this->wifiClient->connected();
+	}
 
 
 
@@ -338,31 +346,35 @@
 				buffer[2] = 0;
 				buffer[3] = 0;
 				wifiClient->write((unsigned char*)buffer, 4);
+				Serial.println("ping send");
+				
 				free(buffer);
 			}
 		}
 		
 	}
 
+	
 	void RemoteMe::waitForConnection() {
 		static unsigned long lastTimePing = 0;
 		
 		if (socketEnabled) {
-			if (lastTimePing + PING_SEND < deltaMillis() && socketConnected) {
+			if (lastTimePing + PING_SEND < deltaMillis() && isSocketConnected()) {
 				ping();
 				lastTimePing = deltaMillis();
 			}
-			if (!socketConnected || (lastTimePingReceived+ PING_RECEIVE_TIMEOUT < deltaMillis())) {
+			if (!isSocketConnected() || (lastTimePingReceived+ PING_RECEIVE_TIMEOUT < deltaMillis())) {
 			
-
+				Serial.println("not connected or didnt got ping ");
+					
 				socketConnected = false;
-				while (!socketConnected) {
+				while (!isSocketConnected()) {
 					if (wifiClient != nullptr) {
 						wifiClient->stop();
 					}
 
 					wifiClient = new WiFiClient();
-					Serial.println("connecting");
+					Serial.println("connecting ...");
 					if (wifiClient->connect(REMOTEME_HOST, REMOTEME_SOCKET_PORT)) {
 
 						String tokenS = String(token);
@@ -379,7 +391,7 @@
 						if (this->variables != nullptr) {
 							sendVariableObserveMessage();
 						}
-
+						Serial.println("connected");
 						free(buffer);
 					}
 					else {
@@ -453,6 +465,7 @@
 
 			if (messageId==0 && size == 0) {
 				lastTimePingReceived = deltaMillis();
+				Serial.println("ping received");
 				return;
 			}
 
@@ -464,6 +477,7 @@
 
 			while (wifiClient->available() <size) {
 				if (deltaMillis()<time + 3000) {//timeout
+					Serial.println("timout readoing rest message");
 					return;
 				}
 			}

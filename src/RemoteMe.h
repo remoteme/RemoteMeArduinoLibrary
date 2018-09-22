@@ -166,7 +166,7 @@
 		long lastTimePingReceived;
 		
 		void socketLoop();
-
+		bool isSocketConnected();
 		
 		void processMessage(uint8_t *payload);
 		
