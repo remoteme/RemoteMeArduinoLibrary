@@ -6,7 +6,7 @@
 
 
 #include "RemoteMe.h"
-#include "Variables.h"
+#include "RemoteMeConnector.h"
 
 
 	RemoteMe::RemoteMe(char * token, uint16_t deviceId) {
@@ -83,7 +83,7 @@
 					RemoteMeMessagesUtils::putUint8(returnData, posR, 0);
 				#endif
 				RemoteMeMessagesUtils::putUint16(returnData, posR, LOCAL_SERVER_PORT);
-				RemoteMeMessagesUtils::putString(returnData, posR, WiFi.localIP().toString());
+				RemoteMeMessagesUtils::putString(returnData, posR, this->connector->getIp());
 				sendSyncResponseMessage(messageId, returnDataSize, returnData);
 				free(returnData);
 			}
@@ -109,69 +109,11 @@
 			//Serial.println("message type  is not supported");
 		}
 	}
-	#ifdef  REST_CONNECTIONS
-	String RemoteMe::callRest(String restUrl){
-		HttpClient* httpClient;
-		if (httpClient == nullptr) {
-			WiFiClient wifiClient;
-			httpClient = new HttpClient(wifiClient, REMOTEME_HOST, REMOTEME_HTTP_PORT);
-		}
-		
-		httpClient->beginRequest();
-		httpClient->get(restUrl);
-		httpClient->sendHeader("Content-Type", "text/plain");
-		httpClient->sendHeader("Content-Length", 0);
-		httpClient->sendHeader("token", token);
-		httpClient->endRequest();
 
-	
-		int statusCode = httpClient->responseStatusCode();
-		return httpClient->responseBody();
-		
-	}
-	
-	void RemoteMe::sendByRest(uint8_t * payload,uint16_t length ){
-
-		//secure
-		//WiFiClient  tcp = new WiFiClientSecure();
-
-		
-		HttpClient* httpClient;
-		if (httpClient == nullptr) {
-			WiFiClient wifiClient;
-
-			httpClient = new HttpClient(wifiClient, REMOTEME_HOST, REMOTEME_HTTP_PORT);
-
-		}
-
-		
-
-	
-		httpClient->beginRequest();
-		httpClient->post("/api/rest/v1/message/sendMessage/");//longest
-		httpClient->sendHeader("Content-Type", "text/plain");
-		httpClient->sendHeader("Content-Length", length);
-		httpClient->sendHeader("token", token);
-		httpClient->endRequest();
-
-		httpClient->write(payload, length);
-		int statusCode = httpClient->responseStatusCode();
-		String response = httpClient->responseBody();
-
-		
-		
-		// read the status code and body of the response
-	//	int statusCode = httpClient->responseStatusCode();
-
-
-	}
-	
-	#endif
-	
-	void RemoteMe::setupTwoWayCommunication() {
-		
-		socketEnabled = true;
-		waitForConnection();
+	void RemoteMe::setConnector(RemoteMeConnector* connector) {
+		this->connector = connector;
+		this->connector->setRemoteMe(this);
+		this->connector->waitForConnection();
 	}
 
 	
@@ -266,17 +208,7 @@
 	}
 	
 	void RemoteMe::send(uint8_t * payload,uint16_t size ) {
-	
-
-		if (socketConnected) {
-			wifiClient->write((unsigned char*)payload, size);
-		}
-		else {
-			#ifdef  REST_CONNECTIONS
-			sendByRest(payload, size);
-			#endif
-		}
-	
+		this->connector->send(payload, size);
 	}
 
 	
@@ -324,108 +256,7 @@
 	}
 
 
-	bool RemoteMe::isSocketConnected(){
-		if (!socketConnected){
-			//Serial.println("socketConnected is false");
-			return false;
-		}
-		if (this->wifiClient==nullptr){
-			//Serial.println("wifi client is nullpointer");
-			return false;
-		}
-		if (this->wifiClient->connected()){
-			return true;
-		}else{
-			//Serial.println("wifi client not connected");
-			return false;
-		}
-		
-	}
 
-
-
-	void RemoteMe::ping() {
-		
-		if (socketEnabled) {
-			if (socketConnected) {
-				uint8_t *buffer = (uint8_t*)malloc(4);
-				buffer[0] = 0;
-				buffer[1] = 0;
-				buffer[2] = 0;
-				buffer[3] = 0;
-				wifiClient->write((unsigned char*)buffer, 4);
-				//Serial.println("ping send");
-				
-				free(buffer);
-			}
-		}
-		
-	}
-
-	
-	void RemoteMe::waitForConnection() {
-		static unsigned long lastTimePing = 0;
-		
-		if (socketEnabled) {
-			if (lastTimePing + PING_SEND < deltaMillis() && isSocketConnected()) {
-				ping();
-				lastTimePing = deltaMillis();
-			}
-			if (!isSocketConnected() || (lastTimePingReceived+ PING_RECEIVE_TIMEOUT < deltaMillis()))  {
-				
-				//Serial.println("not connected or didnt got ping ");
-				bool continousRestarting = false;
-				
-				socketConnected = false;
-				while (!isSocketConnected()) {
-					if (wifiClient != nullptr) {
-						wifiClient->stop();
-						delete wifiClient;
-					}
-					//Serial.println(continousRestarting);
-					if (continousRestarting){
-						delay(500);
-					}else{
-						continousRestarting=true;
-					}
-					
-					wifiClient = new WiFiClient();
-					//Serial.println("connecting ...");
-					int status=wifiClient->connect(REMOTEME_HOST, REMOTEME_SOCKET_PORT);
-					if (status==1) {
-
-						String tokenS = String(token);
-						uint16_t sizeToSend = 2 + tokenS.length() + 1;
-						uint8_t* buffer = (uint8_t*)malloc(sizeToSend);
-						uint16_t pos = 0;
-						RemoteMeMessagesUtils::putUint16(buffer, pos, deviceId);	
-						RemoteMeMessagesUtils::putString(buffer, pos, tokenS);
-						socketConnected = sizeToSend == wifiClient->write((unsigned char*)buffer, sizeToSend);
-						lastTimePingReceived = deltaMillis() + 2 * PING_RECEIVE_TIMEOUT;
-
-						//Serial.println("sending variables");
-
-						if (this->variables != nullptr) {
-							sendVariableObserveMessage();
-						}
-						//Serial.println("connected");
-						free(buffer);
-					}
-					else {
-						 //Serial.printf("not connected");
-						 
-						//Serial.printf("WiFi.status():  %d\n",WiFi.status());
-						
-						 //Serial.printf("wifiClient->status():  %d\n",wifiClient->status());
-						
-					
-					}
-				}
-	
-			}
-		}
-		
-	}
 
 	#ifdef DIRECT_CONNECTIONS
 	void RemoteMe::webSocketServerEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
@@ -465,10 +296,10 @@
 	
 	void RemoteMe::loop() {
 		
-		waitForConnection();
-		if (socketEnabled) {
-			socketLoop();
-		}
+		this->connector->waitForConnection();
+		this->connector->loop();
+		
+
 		#ifdef DIRECT_CONNECTIONS
 		if (webSocketServer != nullptr) {
 			webSocketServer->loop();
@@ -477,52 +308,13 @@
 	}
 
 
-	void RemoteMe::socketLoop() {
-		if (wifiClient->available() >= 4) {
-			uint8_t *buffer = (uint8_t*)malloc(4);
-			wifiClient->read(buffer, 4);
-			uint16_t pos = 0;
-			uint16_t messageId = RemoteMeMessagesUtils::getUint16(buffer, pos);
-			uint16_t size = RemoteMeMessagesUtils::getUint16(buffer, pos);
-			free(buffer);
-
-			if (messageId==0 && size == 0) {
-				lastTimePingReceived = deltaMillis();
-				//Serial.println("ping received");
-				return;
-			}
-
-			uint16_t bufferPos = 0;
-			buffer = (uint8_t*)malloc(size + 4);
-			RemoteMeMessagesUtils::putUint16(buffer, bufferPos, messageId);
-			RemoteMeMessagesUtils::putUint16(buffer, bufferPos, size);
-			unsigned long time = deltaMillis();
-
-			while (wifiClient->available() <size) {
-				if (deltaMillis()<time + 3000) {//timeout
-					//Serial.println("timout readoing rest message");
-					return;
-				}
-			}
-
-			
-			wifiClient->read(&buffer[pos], size);
-			processMessage(buffer);
-			free(buffer);
-
-
-		}
-	}
+	
 	void RemoteMe::disconnect() {
-		
-		if (wifiClient != nullptr) {
-			wifiClient->stop();
-			wifiClient=nullptr;
-		}
+		this->connector->disconnect();
 	}
 	
 	long RemoteMe::deltaMillis(){
-		return millis() + 2 * PING_RECEIVE_TIMEOUT;
+		return millis() + 400000l;
 	}
 	uint16_t RemoteMe::getDeviceId() {
 		return deviceId;
@@ -540,11 +332,17 @@
 	}
 
 	void RemoteMe::sendVariableObserveMessage() {
-		uint8_t* data;
-		uint16_t size = this->getVariables()->getVariableObserveMessage(data);
+		if (variables != nullptr) {
+			uint8_t* data;
+			uint16_t size = this->getVariables()->getVariableObserveMessage(data);
 
+			Serial.println("sending variables remoteme");
+			send(data, size);
+			free(data);
+		}
+		else {
+			Serial.println("variables are null");
+		}
 		
-		send(data, size);
-		free(data);
 
 	}
