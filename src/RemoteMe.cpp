@@ -326,12 +326,20 @@
 
 	bool RemoteMe::isSocketConnected(){
 		if (!socketConnected){
+			//Serial.println("socketConnected is false");
 			return false;
 		}
 		if (this->wifiClient==nullptr){
+			//Serial.println("wifi client is nullpointer");
 			return false;
 		}
-		return this->wifiClient->connected();
+		if (this->wifiClient->connected()){
+			return true;
+		}else{
+			//Serial.println("wifi client not connected");
+			return false;
+		}
+		
 	}
 
 
@@ -346,7 +354,7 @@
 				buffer[2] = 0;
 				buffer[3] = 0;
 				wifiClient->write((unsigned char*)buffer, 4);
-				Serial.println("ping send");
+				//Serial.println("ping send");
 				
 				free(buffer);
 			}
@@ -363,39 +371,54 @@
 				ping();
 				lastTimePing = deltaMillis();
 			}
-			if (!isSocketConnected() || (lastTimePingReceived+ PING_RECEIVE_TIMEOUT < deltaMillis())) {
-			
-				Serial.println("not connected or didnt got ping ");
-					
+			if (!isSocketConnected() || (lastTimePingReceived+ PING_RECEIVE_TIMEOUT < deltaMillis()))  {
+				
+				//Serial.println("not connected or didnt got ping ");
+				bool continousRestarting = false;
+				
 				socketConnected = false;
 				while (!isSocketConnected()) {
 					if (wifiClient != nullptr) {
 						wifiClient->stop();
+						delete wifiClient;
 					}
-
+					//Serial.println(continousRestarting);
+					if (continousRestarting){
+						delay(500);
+					}else{
+						continousRestarting=true;
+					}
+					
 					wifiClient = new WiFiClient();
-					Serial.println("connecting ...");
-					if (wifiClient->connect(REMOTEME_HOST, REMOTEME_SOCKET_PORT)) {
+					//Serial.println("connecting ...");
+					int status=wifiClient->connect(REMOTEME_HOST, REMOTEME_SOCKET_PORT);
+					if (status==1) {
 
 						String tokenS = String(token);
 						uint16_t sizeToSend = 2 + tokenS.length() + 1;
 						uint8_t* buffer = (uint8_t*)malloc(sizeToSend);
 						uint16_t pos = 0;
-						RemoteMeMessagesUtils::putUint16(buffer, pos, deviceId);
+						RemoteMeMessagesUtils::putUint16(buffer, pos, deviceId);	
 						RemoteMeMessagesUtils::putString(buffer, pos, tokenS);
 						socketConnected = sizeToSend == wifiClient->write((unsigned char*)buffer, sizeToSend);
 						lastTimePingReceived = deltaMillis() + 2 * PING_RECEIVE_TIMEOUT;
 
-						Serial.println("sending variables");
+						//Serial.println("sending variables");
 
 						if (this->variables != nullptr) {
 							sendVariableObserveMessage();
 						}
-						Serial.println("connected");
+						//Serial.println("connected");
 						free(buffer);
 					}
 					else {
-						Serial.println("did not connect");
+						 //Serial.printf("not connected");
+						 
+						//Serial.printf("WiFi.status():  %d\n",WiFi.status());
+						
+						 //Serial.printf("wifiClient->status():  %d\n",wifiClient->status());
+						
+					
 					}
 				}
 	
@@ -465,7 +488,7 @@
 
 			if (messageId==0 && size == 0) {
 				lastTimePingReceived = deltaMillis();
-				Serial.println("ping received");
+				//Serial.println("ping received");
 				return;
 			}
 
@@ -477,7 +500,7 @@
 
 			while (wifiClient->available() <size) {
 				if (deltaMillis()<time + 3000) {//timeout
-					Serial.println("timout readoing rest message");
+					//Serial.println("timout readoing rest message");
 					return;
 				}
 			}
