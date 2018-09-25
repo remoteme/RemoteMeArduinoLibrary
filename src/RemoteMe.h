@@ -14,6 +14,11 @@
 	#include <WebSocketsServer.h>
 #endif
 
+#ifdef DEBUG_ESP_PORT
+#define DEBUG_REMOTEME(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#else
+#define DEBUG_REMOTEME(...)
+#endif
 
 
 #ifndef _REMOTEME_h

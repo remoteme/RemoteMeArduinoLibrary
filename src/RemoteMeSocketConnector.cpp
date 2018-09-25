@@ -10,9 +10,8 @@ String  RemoteMeSocketConnector::getIp() {
 
 
 	void RemoteMeSocketConnector::send(uint8_t * payload,uint16_t size ) {
-		Serial.println("sending message");
 		if (socketConnected) {
-			Serial.println("sending message XXX");
+			DEBUG_REMOTEME("[RMM] sending message\n");
 			wifiClient->write((unsigned char*)payload, size);
 		}
 	
@@ -22,19 +21,12 @@ String  RemoteMeSocketConnector::getIp() {
 
 	bool RemoteMeSocketConnector::isSocketConnected(){
 		if (!socketConnected){
-			//Serial.println("socketConnected is false");
 			return false;
 		}
 		if (this->wifiClient==nullptr){
-			//Serial.println("wifi client is nullpointer");
 			return false;
 		}
-		if (this->wifiClient->connected()){
-			return true;
-		}else{
-			//Serial.println("wifi client not connected");
-			return false;
-		}
+		return this->wifiClient->connected();
 		
 	}
 
@@ -48,7 +40,7 @@ String  RemoteMeSocketConnector::getIp() {
 			buffer[2] = 0;
 			buffer[3] = 0;
 			wifiClient->write((unsigned char*)buffer, 4);
-			//Serial.println("ping send");
+			DEBUG_REMOTEME("[RMM] ping send\n");
 				
 			free(buffer);
 		}
@@ -64,8 +56,8 @@ String  RemoteMeSocketConnector::getIp() {
 		}
 		if (!isSocketConnected() || (lastTimePingReceived+ PING_RECEIVE_TIMEOUT < deltaMillis()))  {
 				
-			Serial.println("not connected or didnt got ping ");
-			bool continousRestarting = false;
+			DEBUG_REMOTEME("[RMM] not connected or didnt got ping \n");
+			int continousRestarting = 0;
 				
 			socketConnected = false;
 			while (!isSocketConnected()) {
@@ -73,15 +65,18 @@ String  RemoteMeSocketConnector::getIp() {
 					wifiClient->stop();
 					delete wifiClient;
 				}
-				Serial.println(continousRestarting);
-				if (continousRestarting){
-					delay(500);
-				}else{
-					continousRestarting=true;
+				
+				if (continousRestarting>0){
+					delay(100);
 				}
-					
+				continousRestarting++;
+				if (continousRestarting>300){
+					DEBUG_REMOTEME("[RMM] Restarting esp\n");
+					ESP.restart();
+				}
+				
 				wifiClient = new WiFiClient();
-				//Serial.println("connecting ...");
+				DEBUG_REMOTEME("[RMM] connecting ...\n");
 				int status=wifiClient->connect(REMOTEME_HOST, REMOTEME_SOCKET_PORT);
 				if (status==1) {
 
@@ -94,22 +89,16 @@ String  RemoteMeSocketConnector::getIp() {
 					socketConnected = sizeToSend == wifiClient->write((unsigned char*)buffer, sizeToSend);
 					lastTimePingReceived = deltaMillis() + 2 * PING_RECEIVE_TIMEOUT;
 
-					Serial.println("sending variables");
+					DEBUG_REMOTEME("[RMM] sending variables\n");
 
 					
 					sendVariableObserveMessage();
 					
-					Serial.println("connected");
+					DEBUG_REMOTEME("[RMM] connected\n");
 					free(buffer);
 				}
 				else {
-						//Serial.printf("not connected");
-						 
-					//Serial.printf("WiFi.status():  %d\n",WiFi.status());
-						
-						//Serial.printf("wifiClient->status():  %d\n",wifiClient->status());
-						
-					
+					DEBUG_REMOTEME("[RMM]not connected\n");
 				}
 			}
 	
@@ -131,7 +120,7 @@ String  RemoteMeSocketConnector::getIp() {
 
 			if (messageId==0 && size == 0) {
 				lastTimePingReceived = deltaMillis();
-				//Serial.println("ping received");
+				DEBUG_REMOTEME("[RMM] ping received\n");
 				return;
 			}
 
@@ -143,7 +132,7 @@ String  RemoteMeSocketConnector::getIp() {
 
 			while (wifiClient->available() <size) {
 				if (deltaMillis()<time + 3000) {//timeout
-					//Serial.println("timout readoing rest message");
+					DEBUG_REMOTEME("[RMM] timeout readoing rest of message\n");
 					return;
 				}
 			}

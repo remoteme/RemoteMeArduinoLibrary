@@ -14,6 +14,9 @@
 #endif
 
 
+#define PING_SEND 40000
+#define PING_RECEIVE_TIMEOUT 80000
+
 #include <RemoteMe.h>
 
 class RemoteMeConnector{

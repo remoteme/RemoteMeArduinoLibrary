@@ -106,7 +106,7 @@
 
 		}
 		else {
-			//Serial.println("message type  is not supported");
+			DEBUG_REMOTEME("[RMM] message type  is not supported \n");
 		}
 	}
 
@@ -336,12 +336,12 @@
 			uint8_t* data;
 			uint16_t size = this->getVariables()->getVariableObserveMessage(data);
 
-			Serial.println("sending variables remoteme");
+			DEBUG_REMOTEME("[RMM] sending variables remoteme \n");
 			send(data, size);
 			free(data);
 		}
 		else {
-			Serial.println("variables are null");
+			DEBUG_REMOTEME("[RMM] variables are null \n");
 		}
 		
 

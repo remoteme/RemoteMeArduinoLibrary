@@ -9,8 +9,6 @@
 
 #include <functional>
 
-#define PING_SEND 40000
-#define PING_RECEIVE_TIMEOUT 80000
 
 #define NETWORK_ESP8266_ASYNC   (0)
 #define NETWORK_ESP8266         (1)
