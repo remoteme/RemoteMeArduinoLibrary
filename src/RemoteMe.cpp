@@ -7,7 +7,7 @@
 
 #include "RemoteMe.h"
 #include "RemoteMeConnector.h"
-
+#include "RemoteMeDirectConnector.h"
 
 	RemoteMe::RemoteMe(char * token, uint16_t deviceId) {
 		this->token = std::move(token);
@@ -73,16 +73,16 @@
 				uint16_t returnDataSize = 1 + 2 + 16;
 
 				uint8_t* returnData= (uint8_t*)malloc(returnDataSize);
-				#ifdef DIRECT_CONNECTIONS
-					if (webSocketServer==nullptr) {
-						RemoteMeMessagesUtils::putUint8(returnData, posR, 0);
-					}else {
-						RemoteMeMessagesUtils::putUint8(returnData, posR, 1);
-					}
-				#else
+				
+				if (remoteMeDirectConnector==nullptr) {
 					RemoteMeMessagesUtils::putUint8(returnData, posR, 0);
-				#endif
-				RemoteMeMessagesUtils::putUint16(returnData, posR, LOCAL_SERVER_PORT);
+					RemoteMeMessagesUtils::putUint16(returnData, posR, 0);
+				}else {
+					RemoteMeMessagesUtils::putUint8(returnData, posR, 1);
+					RemoteMeMessagesUtils::putUint16(returnData, posR, LOCAL_SERVER_PORT);
+				}
+			
+			
 				RemoteMeMessagesUtils::putString(returnData, posR, this->connector->getIp());
 				sendSyncResponseMessage(messageId, returnDataSize, returnData);
 				free(returnData);
@@ -104,9 +104,14 @@
 			}
 
 
+		}else if (messageType == RemotemeStructures::VARIABLE_CHANGE_MESSAGE) {
+
+			if (rm.variables != nullptr) {
+				rm.variables->onChangeVariableMessage(payload);
+			}
 		}
 		else {
-			DEBUG_REMOTEME("[RMM] message type  is not supported \n");
+			DEBUG_REMOTEME("[RMM] message type  is not supported  \n");
 		}
 	}
 
@@ -115,8 +120,20 @@
 		this->connector->setRemoteMe(this);
 		this->connector->waitForConnection();
 	}
-
 	
+	void RemoteMe::setDirectConnector(RemoteMeDirectConnector* remoteMeDirectConnector) {
+		this->remoteMeDirectConnector = remoteMeDirectConnector;
+		this->remoteMeDirectConnector->setRemoteMe(this);
+	}
+	
+	std::list<uint16_t>* RemoteMe::getDirectConnected() {
+		if (this->remoteMeDirectConnector == nullptr) {
+			return nullptr;
+		}
+		else {
+			return this->remoteMeDirectConnector->getDirectConnected();
+		}
+	}
 	uint16_t RemoteMe::sendUserSyncMessage(uint16_t receiverDeviceId, const uint8_t * payload, uint16_t length, uint8_t*& returnData) {
 
 		this->messageId = 0;
@@ -175,8 +192,30 @@
 		
 		uint8_t * data;
 		uint16_t size = RemoteMeMessagesUtils::getUserMessage(renevalWhenFailType, receiverDeviceId, senderDeviceId, messageId, payload, length, data);
-		send(data,size);
+
+		bool sent = false;
+		
+
+		if (~this->sendDirect(receiverDeviceId,data,size)) {
+			send(data,size);
+		}
 		free(data);
+	}
+
+	bool RemoteMe::sendDirect( uint16_t receiverDeviceId,  uint8_t *payload, uint16_t length) {
+
+		if (this->remoteMeDirectConnector != nullptr) {
+			return this->remoteMeDirectConnector->send(receiverDeviceId, payload, length);
+		}
+		else {
+			return false;
+		}
+	}
+
+	void RemoteMe::sendDirect(uint8_t *payload, uint16_t length) {
+		if (this->remoteMeDirectConnector != nullptr) {
+			this->remoteMeDirectConnector->send( payload, length);
+		}
 	}
 
 	void RemoteMe::sendAddDataMessage(uint16_t seriesId, RemotemeStructures::AddDataMessageSetting settings, uint64_t time, double value)
@@ -255,44 +294,6 @@
 		this->onUserSyncMessage = onUserSyncMessage;
 	}
 
-
-
-
-	#ifdef DIRECT_CONNECTIONS
-	void RemoteMe::webSocketServerEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
-		static bool zm = true;
-
-		switch (type) {
-		case WStype_DISCONNECTED:
-			
-			break;
-		case WStype_CONNECTED:
-			
-			break;
-		case WStype_TEXT:
-
-			// send message to server
-			// webSocket.sendTXT("message here");
-			break;
-		case WStype_BIN:
-			if (length > 0) {
-				RemoteMe::getInstance("", 0).processMessage(payload);
-			}
-
-		}
-		
-	}
-
-	
-	void RemoteMe::setupDirectConnections( ) {
-	
-
-		webSocketServer = new WebSocketsServer(LOCAL_SERVER_PORT);
-		webSocketServer->begin();
-		webSocketServer->onEvent(RemoteMe::webSocketServerEvent);
-
-	}
-	#endif
 	
 	void RemoteMe::loop() {
 		
@@ -300,11 +301,10 @@
 		this->connector->loop();
 		
 
-		#ifdef DIRECT_CONNECTIONS
-		if (webSocketServer != nullptr) {
-			webSocketServer->loop();
+		if (remoteMeDirectConnector != nullptr) {
+			remoteMeDirectConnector->loop();
 		}
-		#endif
+		
 	}
 
 

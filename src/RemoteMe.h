@@ -1,7 +1,5 @@
 // RemoteMe.h
 //----------------------------------------
-//#define DIRECT_CONNECTIONS
-//#define REST_CONNECTIONS
 
 
 
@@ -10,9 +8,7 @@
 
 #include <Arduino.h>
 
-#ifdef  DIRECT_CONNECTIONS
-	#include <WebSocketsServer.h>
-#endif
+
 
 #ifdef DEBUG_ESP_PORT
 #define DEBUG_REMOTEME(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
@@ -26,30 +22,28 @@
 
 
 
-#include "Variables.h"
+
 #include "RemoteMeMessagesUtils.h"
+#include "Variables.h"
 
 
 	class Variables;
 	class RemoteMeConnector;
+	class RemoteMeDirectConnector;
 
 	class RemoteMe
 	{
 		friend class RemoteMeConnector;
+		friend class RemoteMeDirectConnector;
+		friend class Variables;
 
 		const char* token;
 		uint16_t deviceId;
-		RemoteMeConnector* connector;
-		
+		RemoteMeConnector* connector = nullptr;
+		RemoteMeDirectConnector* remoteMeDirectConnector = nullptr;
 
 		Variables* variables = nullptr;
 
-	
-		#ifdef  DIRECT_CONNECTIONS
-			WebSocketsServer* webSocketServer = nullptr;
-		#endif
-		
-	
 
 		uint64_t messageId = 0;//used for reponse
 		uint8_t* syncResponseData; //used for reponse
@@ -69,12 +63,16 @@
 		void sendSyncResponseMessage(uint64_t messageId, uint16_t dataSize, uint8_t* data);
 
 
-		
 
 		long deltaMillis();
 
 	protected:
 		void sendVariableObserveMessage();
+		std::list<uint16_t>* getDirectConnected();
+		bool sendDirect(uint16_t receiverDeviceId, uint8_t *payload, uint16_t length);
+		void sendDirect(uint8_t *payload, uint16_t length);
+		void send(uint8_t * payload, uint16_t size);
+
 	public:
 		static RemoteMe& getInstance(char * token, int deviceId)
 		{
@@ -87,16 +85,13 @@
 		RemoteMe(RemoteMe const&) = delete;
 		void operator=(RemoteMe const&) = delete;
 
-		#ifdef  DIRECT_CONNECTIONS
-		static void webSocketServerEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length);
-		void setupDirectConnections();
-		#endif
+		
 		void setConnector(RemoteMeConnector* remoteMeConnector);
+		void setDirectConnector(RemoteMeDirectConnector* remoteMeDirectConnector);
 		inline const char* getToken() { return token; }
 
 		void loop();
 		void disconnect();
-		void send(uint8_t * payload, uint16_t size);
 		
 		uint16_t getDeviceId();
 		void sendAddDataMessage(uint16_t seriesId, RemotemeStructures::AddDataMessageSetting settings, uint64_t time, double value);

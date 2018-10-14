@@ -110,8 +110,6 @@
 #define _REMOTEMESocketConnector_h
 
 
-#define REMOTEME_HOST "app.remoteme.org"
-#define REMOTEME_HTTP_PORT 80
 
 class RemoteMe;
 

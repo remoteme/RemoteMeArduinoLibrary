@@ -2,16 +2,16 @@
 
 #include <Arduino.h>
 #include <list>
-#include "RemoteMe.h"
-#include "RemoteMeMessagesUtils.h"
+
 
 
 #ifndef _REMOTEME_VARIABLES_h
 #define _REMOTEME_VARIABLES_h
 
+#include "RemoteMe.h"
+#include "RemoteMeMessagesUtils.h"
 
-
-	class RemoteMe;
+class RemoteMe;
 
 	struct VariableIdentifier {
 		uint16_t type;
@@ -76,8 +76,10 @@
 		uint16_t prepareSetMessage(uint8_t* &payload, uint16_t &pos, boolean ignoreCurrent, String name, uint16_t type, uint8_t additionalSize);
 	protected:
 		void onChangePropagateMessage(uint8_t *payload);
+		void onChangeVariableMessage(uint8_t *payload);
+		void onChangePropagateMessage(uint16_t senderDeviceId, uint16_t receiverDeviceId, uint16_t pos, uint8_t *payload);
 		uint16_t getVariableObserveMessage( uint8_t* &payload);
-
+		void send(uint8_t * payload, uint16_t size);
 	public:
 		Variables(RemoteMe* remoteMe);
 	
