@@ -4,6 +4,7 @@
 
 #include "RemoteMeSocketConnector.h"
 
+
 String  RemoteMeSocketConnector::getIp() {
 	return WiFi.localIP().toString();
 }
@@ -75,27 +76,40 @@ String  RemoteMeSocketConnector::getIp() {
 					ESP.restart();
 				}
 				
-				wifiClient = new WiFiClient();
+				wifiClient = new WEBSOCKETS_NETWORK_CLASS();
 				DEBUG_REMOTEME("[RMM] connecting ...\n");
 				int status=wifiClient->connect(REMOTEME_HOST, REMOTEME_SOCKET_PORT);
+				
 				if (status==1) {
-
+					
+					
 					String tokenS = String(this->remoteMe->getToken());
-					uint16_t sizeToSend = 2 + tokenS.length() + 1;
-					uint8_t* buffer = (uint8_t*)malloc(sizeToSend);
-					uint16_t pos = 0;
-					RemoteMeMessagesUtils::putUint16(buffer, pos, remoteMe->getDeviceId());	
-					RemoteMeMessagesUtils::putString(buffer, pos, tokenS);
-					socketConnected = sizeToSend == wifiClient->write((unsigned char*)buffer, sizeToSend);
+					if (isNewSocket()){
+						uint8_t *payload;
+						uint16_t sizeToSend =  RemoteMeMessagesUtils::getAuthentificateMessage(remoteMe->getDeviceId(),tokenS,payload);
+						
+						socketConnected = sizeToSend == wifiClient->write((unsigned char*)payload, sizeToSend);
+						Serial.printf("new connection status: %d %d\n",sizeToSend,socketConnected);
+						free(payload);
+					}else{
+						uint16_t pos = 0;
+						uint16_t sizeToSend = 2 + tokenS.length() + 1;
+						uint8_t* buffer = (uint8_t*)malloc(sizeToSend);
+						
+						RemoteMeMessagesUtils::putUint16(buffer, pos, remoteMe->getDeviceId());	
+						RemoteMeMessagesUtils::putString(buffer, pos, tokenS);
+						socketConnected = sizeToSend == wifiClient->write((unsigned char*)buffer, sizeToSend);
+						free(buffer);
+					}
+					
 					lastTimePingReceived = deltaMillis() + 2 * PING_RECEIVE_TIMEOUT;
 
 					DEBUG_REMOTEME("[RMM] sending variables\n");
-
 					
 					sendVariableObserveMessage();
 					
 					DEBUG_REMOTEME("[RMM] connected\n");
-					free(buffer);
+					
 				}
 				else {
 					DEBUG_REMOTEME("[RMM]not connected\n");

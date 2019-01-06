@@ -15,6 +15,7 @@ namespace RemotemeStructures
 	
 
 	enum MessageType {
+		PING=0,AUTHENTIFICATE=50,
 		USER_MESSAGE = 100, USER_MESSAGE_DELIVER_STATUS = 101, USER_SYNC_MESSAGE = 102,
 		VARIABLE_CHANGE_MESSAGE= 103, VARIABLE_CHANGE_PROPAGATE_MESSAGE = 104,
 		SYNC_MESSAGE = 120, SYNC_RESPONSE_MESSAGE = 121, 
@@ -88,7 +89,8 @@ namespace RemotemeStructures
 		static uint16_t getRegisterDeviceMessage(uint16_t deviceId, String deviceName, RemotemeStructures::DeviceType deviceType, RemotemeStructures::NetworkDeviceType networkDeviceType, uint8_t* &payload);
 		static uint16_t getLogMessage(RemotemeStructures::LogLevel logLevel, String str, uint8_t* &payload);
 		static uint16_t getRegisterChildDeviceMessage(uint16_t parentDeviceId, uint16_t deviceId, String deviceName, uint8_t* &payload);
-
+		static uint16_t getAuthentificateMessage(uint16_t deviceId, String token, uint8_t* &payload);
+						
 	
 	};
 

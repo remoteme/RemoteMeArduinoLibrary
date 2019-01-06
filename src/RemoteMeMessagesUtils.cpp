@@ -340,5 +340,20 @@ uint16_t RemoteMeMessagesUtils::getRegisterChildDeviceMessage(uint16_t parentDev
 
 	return size+4;
 }
+uint16_t RemoteMeMessagesUtils::getAuthentificateMessage(uint16_t deviceId, String token, uint8_t* &payload){
+	uint16_t size = 2 + token.length()+1;//2 short  
+	payload = (uint8_t*)malloc(size+4);
 
+
+	uint16_t pos = 0;
+
+
+	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::AUTHENTIFICATE);
+	RemoteMeMessagesUtils::putUint16(payload, pos, size);
+
+	RemoteMeMessagesUtils::putUint16(payload, pos, deviceId);
+	RemoteMeMessagesUtils::putString(payload, pos, token);
+	
+	return size+4;
+}
 

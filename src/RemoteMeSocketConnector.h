@@ -53,8 +53,7 @@
 #error "network type ESP8266 ASYNC only possible on the ESP mcu!"
 #endif
 
-#include <ESPAsyncTCP.h>
-#include <ESPAsyncTCPbuffer.h>
+
 #define WEBSOCKETS_NETWORK_CLASS AsyncTCPbuffer
 
 
@@ -105,7 +104,6 @@
 #include <Arduino.h>
 
 #include <RemoteMeConnector.h>
-
 #ifndef _REMOTEMESocketConnector_h
 #define _REMOTEMESocketConnector_h
 
@@ -117,7 +115,7 @@ class RemoteMeSocketConnector: public RemoteMeConnector
 	{
 
 		bool socketConnected = false;
-		WiFiClient* wifiClient = nullptr;
+		WEBSOCKETS_NETWORK_CLASS* wifiClient = nullptr;
 	
 	public:
 
@@ -133,7 +131,7 @@ class RemoteMeSocketConnector: public RemoteMeConnector
 		
 		void disconnect();
 		void send(uint8_t * payload, uint16_t size);
-		
+		inline boolean isNewSocket(){return 19== REMOTEME_SOCKET_PORT;};
 
 	};
 
