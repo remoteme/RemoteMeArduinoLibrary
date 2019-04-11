@@ -113,6 +113,10 @@
 		void sendRegisterChildDeviceMessage(uint16_t parentDeviceId, uint16_t deviceId, String deviceName);
 		void sendRegisterChildDeviceMessage(uint16_t deviceId, String deviceName);
 		void sendRegisterChildDeviceMessage(uint16_t deviceId);
+		
+		void sendPushNotificationMessage(uint16_t webPageDeviceId, String title, String body, String badge,String icon, String image, int vibrateCount,...);
+		void sendPushNotificationMessage(uint16_t webPageDeviceId, String title, String body, String badge,String icon, String image);
+	
 		void sendLogMessage(RemotemeStructures::LogLevel logLevel, String str);
 
 		void setUserMessageListener(void(*onUserMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data));

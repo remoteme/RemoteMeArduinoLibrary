@@ -305,6 +305,35 @@ uint16_t   RemoteMeMessagesUtils::getRegisterDeviceMessage(uint16_t deviceId, St
 	return size+4;
 
 }
+
+uint16_t RemoteMeMessagesUtils::getPushNotificationMessage(uint16_t webPageDeviceId, String title, String body, String badge, String icon, String image,int vibrateCount,const uint8_t *vibrate,uint8_t* &payload){
+	uint16_t size = 2 +5+ title.length()+ body.length()+ image.length()+ icon.length()+ badge.length()+1+vibrateCount;
+	payload = (uint8_t*)malloc(size+4);
+
+	uint16_t pos = 0;
+
+	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::SEND_PUSH_NOTIFICATION);
+	RemoteMeMessagesUtils::putUint16(payload, pos, size);
+
+
+	RemoteMeMessagesUtils::putUint16(payload, pos, webPageDeviceId);
+	RemoteMeMessagesUtils::putString(payload, pos, title);
+	RemoteMeMessagesUtils::putString(payload, pos, body);
+	RemoteMeMessagesUtils::putString(payload, pos, badge);
+	RemoteMeMessagesUtils::putString(payload, pos, icon);
+	RemoteMeMessagesUtils::putString(payload, pos, image);
+	
+	RemoteMeMessagesUtils::putUint8(payload, pos,vibrateCount);
+		
+	for(int i=0;i<vibrateCount;i++){
+		RemoteMeMessagesUtils::putUint8(payload, pos, vibrate[i]);
+		Serial.println(vibrate[i] );
+	}
+
+	return size+4;
+}
+	
+
 uint16_t RemoteMeMessagesUtils::getLogMessage(RemotemeStructures::LogLevel logLevel, String str, uint8_t* &payload) {
 	uint16_t size = 2 + str.length();
 	payload = (uint8_t*)malloc(size+4);

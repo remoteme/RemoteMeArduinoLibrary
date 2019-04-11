@@ -274,8 +274,24 @@
 		sendRegisterChildDeviceMessage(deviceId, "");
 	}
 
-
-
+	void RemoteMe::sendPushNotificationMessage(uint16_t webPageDeviceId, String title, String body,String badge, String icon, String image) {
+		this->sendPushNotificationMessage(webPageDeviceId,title,body,badge,icon,image,0);
+	}
+	void RemoteMe::sendPushNotificationMessage(uint16_t webPageDeviceId, String title, String body, String badge, String icon, String image,int vibrateCount,...) {
+		uint8_t* data;
+		
+		va_list valst;
+		va_start(valst, vibrateCount);
+		
+		uint8_t* vibrateArr = (uint8_t*)malloc(vibrateCount);
+		for ( int i = 0 ; i < vibrateCount ; i++ ) {
+			vibrateArr[i] = va_arg(valst, int)/10;
+		}
+		uint16_t size= RemoteMeMessagesUtils::getPushNotificationMessage(webPageDeviceId, title,body,badge,icon,image,vibrateCount,vibrateArr,data);
+		send(data,size);
+		free(data);
+		free(vibrateArr);
+	}
 
 	void RemoteMe::sendLogMessage(RemotemeStructures::LogLevel logLevel, String str) {
 		uint8_t* data;
