@@ -22,8 +22,9 @@ namespace RemotemeStructures
 		VARIABLE_OBSERVE_MESSAGE =122,
 		WEBRTC_MESSAGE = 150,
 		REGISTER_DEVICE = 200, REGISTER_CHILD_DEVICE = 201, ADD_DATA = 300,
-
-		UPDATEFILE = 400,
+		
+		SET_FILE_CONTENT=500,
+		
 		LOGG = 20000, SYSTEM_MESSAGE = 20001
 	};
 
@@ -91,7 +92,9 @@ namespace RemotemeStructures
 		static uint16_t getLogMessage(RemotemeStructures::LogLevel logLevel, String str, uint8_t* &payload);
 		static uint16_t getRegisterChildDeviceMessage(uint16_t parentDeviceId, uint16_t deviceId, String deviceName, uint8_t* &payload);
 		static uint16_t getAuthentificateMessage(uint16_t deviceId, String token, uint8_t* &payload);
-						
+					
+		static uint16_t getSetFileContentMessage(uint16_t deviceId, String fileName,bool append,uint16_t dataSize,const uint8_t* data , uint8_t* &payload);
+					
 	
 	};
 

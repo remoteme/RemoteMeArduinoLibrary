@@ -117,6 +117,9 @@
 		void sendPushNotificationMessage(uint16_t webPageDeviceId, String title, String body, String badge,String icon, String image, int vibrateCount,...);
 		void sendPushNotificationMessage(uint16_t webPageDeviceId, String title, String body, String badge,String icon, String image);
 	
+		void setFileContent(uint16_t deviceId,String fileName,int dataSize, const uint8_t* data);
+	
+	
 		void sendLogMessage(RemotemeStructures::LogLevel logLevel, String str);
 
 		void setUserMessageListener(void(*onUserMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data));

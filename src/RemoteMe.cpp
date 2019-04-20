@@ -292,6 +292,34 @@
 		free(data);
 		free(vibrateArr);
 	}
+	
+
+	void RemoteMe::setFileContent(uint16_t deviceId,String fileName,int dataSize, const uint8_t* content) {
+		uint16_t dataPerOnePackage = 256*256-4-2-1-fileName.length()-1;
+		int offset=0;
+		bool first=true;
+		while(dataSize>0){
+			uint16_t currentPackageSize=dataSize<dataPerOnePackage?dataSize:dataPerOnePackage;
+			dataSize-=currentPackageSize;
+			
+			uint8_t* singelData = (uint8_t*)malloc(currentPackageSize);
+			memcpy( singelData,&content[offset], currentPackageSize);
+			
+			offset+=currentPackageSize;
+			
+			uint8_t* data;
+			uint16_t size= RemoteMeMessagesUtils::getSetFileContentMessage(deviceId, fileName,!first,currentPackageSize,singelData,data);
+			send(data,size);
+			
+			free(data);
+			free(singelData);
+			first=false;
+		}
+		
+		
+	
+	}
+	
 
 	void RemoteMe::sendLogMessage(RemotemeStructures::LogLevel logLevel, String str) {
 		uint8_t* data;

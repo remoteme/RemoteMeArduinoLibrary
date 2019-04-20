@@ -386,3 +386,21 @@ uint16_t RemoteMeMessagesUtils::getAuthentificateMessage(uint16_t deviceId, Stri
 	return size+4;
 }
 
+uint16_t RemoteMeMessagesUtils::getSetFileContentMessage(uint16_t deviceId, String fileName,bool append,uint16_t dataSize,const uint8_t* data , uint8_t* &payload){
+	uint16_t size = 2 + fileName.length()+1+1+dataSize;
+	payload = (uint8_t*)malloc(size+4);
+
+
+	uint16_t pos = 0;
+
+
+	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::SET_FILE_CONTENT);
+	RemoteMeMessagesUtils::putUint16(payload, pos, size);
+
+	RemoteMeMessagesUtils::putUint16(payload, pos, deviceId);
+	RemoteMeMessagesUtils::putString(payload, pos, fileName);
+	RemoteMeMessagesUtils::putUint8(payload, pos, append?1:0);
+	RemoteMeMessagesUtils::putArray(payload, pos,data,dataSize);
+	
+	return size+4;
+}
