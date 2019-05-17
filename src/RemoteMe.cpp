@@ -193,10 +193,8 @@
 		uint8_t * data;
 		uint16_t size = RemoteMeMessagesUtils::getUserMessage(renevalWhenFailType, receiverDeviceId, senderDeviceId, messageId, payload, length, data);
 
-		bool sent = false;
 		
-
-		if (~this->sendDirect(receiverDeviceId,data,size)) {
+		if (!this->sendDirect(receiverDeviceId,data,size)) {
 			send(data,size);
 		}
 		free(data);

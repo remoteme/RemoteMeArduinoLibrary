@@ -89,7 +89,6 @@ String  RemoteMeSocketConnector::getIp() {
 						uint16_t sizeToSend =  RemoteMeMessagesUtils::getAuthentificateMessage(remoteMe->getDeviceId(),tokenS,payload);
 						
 						socketConnected = sizeToSend == wifiClient->write((unsigned char*)payload, sizeToSend);
-						Serial.printf("new connection status: %d %d\n",sizeToSend,socketConnected);
 						free(payload);
 					}else{
 						uint16_t pos = 0;

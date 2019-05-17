@@ -327,7 +327,6 @@ uint16_t RemoteMeMessagesUtils::getPushNotificationMessage(uint16_t webPageDevic
 		
 	for(int i=0;i<vibrateCount;i++){
 		RemoteMeMessagesUtils::putUint8(payload, pos, vibrate[i]);
-		Serial.println(vibrate[i] );
 	}
 
 	return size+4;

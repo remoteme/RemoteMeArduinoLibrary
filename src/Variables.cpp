@@ -373,8 +373,7 @@ uint16_t Variables::prepareSetMessage(uint8_t* &payload, uint16_t &pos, boolean 
 	if (ignoreCurrent) {
 		ignoreCount++;
 	}
-	Serial.println(ignoreCount);
-
+	
 	size += 2 * ignoreCount;
 
 	payload = (uint8_t*)malloc(size + 4);
@@ -414,7 +413,6 @@ void Variables::setBoolean(String name, boolean value,boolean ignoreCurrent) {
 	uint8_t* payload;
 	uint16_t pos = 0;
 	uint16_t size =  prepareSetMessage(payload, pos, ignoreCurrent,name, RemotemeStructures::VariableOberverType::BOOLEAN ,1);
-
 
 	RemoteMeMessagesUtils::putBoolean(payload, pos, value );
 
