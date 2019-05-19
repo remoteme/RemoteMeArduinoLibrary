@@ -306,7 +306,7 @@
 			offset+=currentPackageSize;
 			
 			uint8_t* data;
-			uint16_t size= RemoteMeMessagesUtils::getSetFileContentMessage(deviceId, fileName,!first,currentPackageSize,singelData,data);
+			uint16_t size= RemoteMeMessagesUtils::getSetFileContentMessage(deviceId, fileName,!first,dataSize==0,currentPackageSize,singelData,data);
 			send(data,size);
 			
 			free(data);

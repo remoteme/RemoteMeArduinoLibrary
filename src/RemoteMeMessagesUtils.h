@@ -93,7 +93,7 @@ namespace RemotemeStructures
 		static uint16_t getRegisterChildDeviceMessage(uint16_t parentDeviceId, uint16_t deviceId, String deviceName, uint8_t* &payload);
 		static uint16_t getAuthentificateMessage(uint16_t deviceId, String token, uint8_t* &payload);
 					
-		static uint16_t getSetFileContentMessage(uint16_t deviceId, String fileName,bool append,uint16_t dataSize,const uint8_t* data , uint8_t* &payload);
+		static uint16_t getSetFileContentMessage(uint16_t deviceId, String fileName,bool append,bool eof,uint16_t dataSize,const uint8_t* data , uint8_t* &payload);
 					
 	
 	};

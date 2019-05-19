@@ -6,8 +6,6 @@
 
 
 #define REMOTEME_HOST "app.remoteme.org"
-#define REMOTEME_HTTP_PORT 80
-
 #define REMOTEME_SOCKET_PORT 19
 
 
