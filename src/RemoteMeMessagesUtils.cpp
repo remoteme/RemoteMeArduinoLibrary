@@ -267,7 +267,7 @@ uint16_t RemoteMeMessagesUtils::getSyncResponseMessage(uint64_t messageId, uint1
 	uint16_t pos = 0;
 
 	payload = (uint8_t*)malloc(size+4);
-	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::SYNC_RESPONSE_MESSAGE);
+	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::SYNC_MESSAGE_RESPONSE);
 	RemoteMeMessagesUtils::putUint16(payload, pos, size);
 
 
@@ -339,7 +339,7 @@ uint16_t RemoteMeMessagesUtils::getLogMessage(RemotemeStructures::LogLevel logLe
 
 	uint16_t pos = 0;
 
-	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::LOGG);
+	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::LOG);
 	RemoteMeMessagesUtils::putUint16(payload, pos, size);
 
 

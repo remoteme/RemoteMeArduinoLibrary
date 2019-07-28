@@ -24,11 +24,12 @@ void Variables::onChangeVariableMessage(uint8_t *payload) {
 
 
 	DEBUG_REMOTEME("[RMM] Change variables by direct conenction \n");
-	onChangePropagateMessage(senderDeviceId, receiverDeviceId, pos, payload);
+	onChangePropagateMessage(senderDeviceId, receiverDeviceId, pos, payload,0,0,0);
 }
 
 
-void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t receiverDeviceId, uint16_t pos, uint8_t *payload) {
+
+void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t receiverDeviceId, uint16_t pos, uint8_t *payload, uint16_t sessionId, uint16_t credit, uint16_t time) {
 	uint16_t count = RemoteMeMessagesUtils::getUint16(payload, pos);
 	DEBUG_REMOTEME("[RMM] Change variables count %d \n", count);
 	while (count != 0) {
@@ -43,17 +44,27 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 			boolean value = RemoteMeMessagesUtils::getInt8(payload, pos) == 1;
 			for (std::list<BooleanVariable>::iterator it = this->booleanVariables.begin(); it != this->booleanVariables.end(); ++it) {
 				if ((*it).name == name) {
-					(*it).toCall(value);
+					if ((*it).toCall != nullptr) {
+						(*it).toCall(value);
+					}
+					if ((*it).toCall_wt != nullptr) {
+						(*it).toCall_wt(value, sessionId,credit,time);
+					}
 					break;
 				}
 			}
-			DEBUG_REMOTEME("[RMM] BOOLEAN varialbe value %d \n",value);
+			DEBUG_REMOTEME("[RMM] BOOLEAN varialbe value %d \n", value);
 		}
 		else if (type == RemotemeStructures::VariableOberverType::INTEGER) {
 			int32_t value = RemoteMeMessagesUtils::getInt32(payload, pos);
 			for (std::list<IntegerVariable>::iterator it = this->integerVariables.begin(); it != this->integerVariables.end(); ++it) {
 				if ((*it).name == name) {
-					(*it).toCall(value);
+					if ((*it).toCall != nullptr) {
+						(*it).toCall(value);
+					}
+					if ((*it).toCall_wt != nullptr) {
+						(*it).toCall_wt(value, sessionId, credit, time);
+					}
 					break;
 				}
 			}
@@ -63,7 +74,12 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 			String value = RemoteMeMessagesUtils::getString(payload, pos);
 			for (std::list<TextVariable>::iterator it = this->textVariables.begin(); it != this->textVariables.end(); ++it) {
 				if ((*it).name == name) {
-					(*it).toCall(value);
+					if ((*it).toCall != nullptr) {
+						(*it).toCall(value);
+					}
+					if ((*it).toCall_wt != nullptr) {
+						(*it).toCall_wt(value, sessionId, credit, time);
+					}
 					break;
 				}
 			}
@@ -75,7 +91,12 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 			uint16_t val3 = RemoteMeMessagesUtils::getInt16(payload, pos);
 			for (std::list<SmallInteger3Variable>::iterator it = this->smallInteger3Variables.begin(); it != this->smallInteger3Variables.end(); ++it) {
 				if ((*it).name == name) {
-					(*it).toCall(val1, val2, val3);
+					if ((*it).toCall != nullptr) {
+						(*it).toCall(val1, val2, val3);
+					}
+					if ((*it).toCall_wt != nullptr) {
+						(*it).toCall_wt(val1, val2, val3, sessionId, credit, time);
+					}
 					break;
 				}
 			}
@@ -87,7 +108,12 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 
 			for (std::list<SmallInteger2Variable>::iterator it = this->smallInteger2Variables.begin(); it != this->smallInteger2Variables.end(); ++it) {
 				if ((*it).name == name) {
-					(*it).toCall(val1, val2);
+					if ((*it).toCall != nullptr) {
+						(*it).toCall(val1, val2);
+					}
+					if ((*it).toCall_wt != nullptr) {
+						(*it).toCall_wt(val1, val2, sessionId, credit, time);
+					}
 					break;
 				}
 			}
@@ -99,7 +125,12 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 
 			for (std::list<IntegerBooleanVariable>::iterator it = this->integerBooleanVariables.begin(); it != this->integerBooleanVariables.end(); ++it) {
 				if ((*it).name == name) {
-					(*it).toCall(value, b);
+					if ((*it).toCall != nullptr) {
+						(*it).toCall(value, b);
+					}
+					if ((*it).toCall_wt != nullptr) {
+						(*it).toCall_wt(value, b, sessionId, credit, time);
+					}
 					break;
 				}
 			}
@@ -109,7 +140,12 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 			double value = RemoteMeMessagesUtils::getDouble(payload, pos);
 			for (std::list<DoubleVariable>::iterator it = this->doubleVariables.begin(); it != this->doubleVariables.end(); ++it) {
 				if ((*it).name == name) {
-					(*it).toCall(value);
+					if ((*it).toCall != nullptr) {
+						(*it).toCall(value);
+					}
+					if ((*it).toCall_wt != nullptr) {
+						(*it).toCall_wt(value, sessionId, credit, time);
+					}
 					break;
 				}
 			}
@@ -119,7 +155,12 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 			String value2 = RemoteMeMessagesUtils::getString(payload, pos);
 			for (std::list<Text2Variable>::iterator it = this->text2Variables.begin(); it != this->text2Variables.end(); ++it) {
 				if ((*it).name == name) {
-					(*it).toCall(value1, value2);
+					if ((*it).toCall != nullptr) {
+						(*it).toCall(value1, value2);
+					}
+					if ((*it).toCall_wt != nullptr) {
+						(*it).toCall_wt(value1, value2, sessionId, credit, time);
+					}
 					break;
 				}
 			}
@@ -134,7 +175,12 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 			String val4 = RemoteMeMessagesUtils::getString(payload, pos);
 			for (std::list<SmallInteger2Text2Variable>::iterator it = this->smallInteger2Text2Variables.begin(); it != this->smallInteger2Text2Variables.end(); ++it) {
 				if ((*it).name == name) {
-					(*it).toCall(val1, val2, val3, val4);
+					if ((*it).toCall != nullptr) {
+						(*it).toCall(val1, val2, val3, val4);
+					}
+					if ((*it).toCall_wt != nullptr) {
+						(*it).toCall_wt(val1, val2, val3, val4, sessionId, credit, time);
+					}
 					break;
 				}
 			}
@@ -144,7 +190,6 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 
 	}
 }
-
 void Variables::onChangePropagateMessage(uint8_t *payload) {
 	uint16_t pos = 0;
 	pos += 4;//type and size
@@ -152,11 +197,40 @@ void Variables::onChangePropagateMessage(uint8_t *payload) {
 	uint16_t senderDeviceId = RemoteMeMessagesUtils::getUint16(payload, pos);
 	uint16_t receiverDeviceId = RemoteMeMessagesUtils::getUint16(payload, pos);
 
-	onChangePropagateMessage(senderDeviceId, receiverDeviceId, pos, payload);
+	onChangePropagateMessage(senderDeviceId, receiverDeviceId, pos, payload,0,0,0);
+}
+
+void Variables::onChangePropagateMessage_wt(uint8_t *payload) {
+	uint16_t pos = 0;
+	pos += 4;//type and size
+
+	uint16_t senderDeviceId = RemoteMeMessagesUtils::getUint16(payload, pos);
+	uint16_t receiverDeviceId = RemoteMeMessagesUtils::getUint16(payload, pos);
+
+	uint16_t sessionId = RemoteMeMessagesUtils::getUint16(payload, pos);
+	uint16_t credit = RemoteMeMessagesUtils::getUint16(payload, pos);
+	uint16_t time = RemoteMeMessagesUtils::getUint16(payload, pos);
+
+
+	onChangePropagateMessage(senderDeviceId, receiverDeviceId, pos, payload, sessionId, credit, time);
 }
 
 
-	uint16_t Variables::getVariableObserveMessage(uint8_t* &payload) {
+
+
+uint16_t Variables::getDecreaseWebPageTokenCreditMessage(uint8_t* payload,uint16_t sessionId, int16_t credit, int16_t time) {
+	payload = (uint8_t*)malloc(6 + 4);
+	uint16_t pos = 0;
+	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::DECREASE_WEBPAGE_TOKEN_CREDIT);
+	RemoteMeMessagesUtils::putUint16(payload, pos, 6);
+	RemoteMeMessagesUtils::putUint16(payload, pos, sessionId);
+	RemoteMeMessagesUtils::putInt16(payload, pos, credit);
+	RemoteMeMessagesUtils::putInt16(payload, pos, time);
+
+	return pos;
+}
+
+uint16_t Variables::getVariableObserveMessage(uint8_t* &payload) {
 
 		uint16_t size = 4;
 		uint16_t variablesCount = 0;
@@ -218,7 +292,7 @@ void Variables::onChangePropagateMessage(uint8_t *payload) {
 		uint16_t pos = 0;
 
 
-		RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::VARIABLE_OBSERVE_MESSAGE);
+		RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::OBSERVER_REGISTER_MESSAGE);
 		RemoteMeMessagesUtils::putUint16(payload, pos, size);
 
 
@@ -355,6 +429,78 @@ void Variables::observeSmallInteger2Text2(String name, void(*toCall)(int16_t, in
 	this->smallInteger2Text2Variables.push_back(bo);
 
 }
+//-----------WB version
+
+void Variables::observeBooleanForRental(String name, void(*toCall)(boolean, uint16_t, uint16_t, uint16_t)) {
+	BooleanVariable bo;
+	bo.toCall_wt = toCall;
+	bo.name = name;
+	this->booleanVariables.push_back(bo);
+}
+
+void Variables::observeIntegerForRental(String name, void(*toCall)(int32_t, uint16_t, uint16_t, uint16_t)) {
+	IntegerVariable bo;
+	bo.toCall_wt = toCall;
+	bo.name = name;
+	this->integerVariables.push_back(bo);
+
+}
+
+
+void Variables::observeTextForRental(String name, void(*toCall)(String, uint16_t, uint16_t, uint16_t)) {
+	TextVariable bo;
+	bo.toCall_wt = toCall;
+	bo.name = name;
+	this->textVariables.push_back(bo);
+
+}
+
+void Variables::observeText2ForRental(String name, void(*toCall)(String, String, uint16_t, uint16_t, uint16_t)) {
+	Text2Variable bo;
+	bo.toCall_wt = toCall;
+	bo.name = name;
+	this->text2Variables.push_back(bo);
+
+}
+void Variables::observeSmallInteger3ForRental(String name, void(*toCall)(int16_t, int16_t, int16_t, uint16_t, uint16_t, uint16_t)) {
+	SmallInteger3Variable bo;
+	bo.toCall_wt = toCall;
+	bo.name = name;
+	this->smallInteger3Variables.push_back(bo);
+
+}
+void Variables::observeSmallInteger2ForRental(String name, void(*toCall)(int16_t, int16_t, uint16_t, uint16_t, uint16_t)) {
+	SmallInteger2Variable bo;
+	bo.toCall_wt = toCall;
+	bo.name = name;
+	this->smallInteger2Variables.push_back(bo);
+
+}
+void Variables::observeIntegerBooleanForRental(String name, void(*toCall)(int32_t, boolean, uint16_t, uint16_t, uint16_t)) {
+	IntegerBooleanVariable bo;
+	bo.toCall_wt = toCall;
+	bo.name = name;
+	this->integerBooleanVariables.push_back(bo);
+
+}
+void Variables::observeDoubleForRental(String name, void(*toCall)(double, uint16_t, uint16_t, uint16_t)) {
+	DoubleVariable bo;
+	bo.toCall_wt = toCall;
+	bo.name = name;
+	this->doubleVariables.push_back(bo);
+
+}
+
+void Variables::observeSmallInteger2Text2ForRental(String name, void(*toCall)(int16_t, int16_t, String, String, uint16_t, uint16_t, uint16_t)) {
+	SmallInteger2Text2Variable bo;
+	bo.toCall_wt = toCall;
+	bo.name = name;
+	this->smallInteger2Text2Variables.push_back(bo);
+
+}
+
+
+//end wb version
 
 
 

@@ -7,7 +7,7 @@
 
 #define REMOTEME_HOST "app.remoteme.org"
 #define REMOTEME_SOCKET_PORT 19
-
+#define REMOTEME_HTTP_PORT 80
 
 
 #define PING_SEND 40000
