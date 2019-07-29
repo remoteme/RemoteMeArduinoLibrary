@@ -61,8 +61,8 @@
 		void(*onUserSyncMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t*, uint16_t& returnDataSize, uint8_t*& returnData ) = nullptr;
 		
 		
-		void(*onUserMessage_wt)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data, uint16_t sessionId, uint16_t credit, uint16_t time) = nullptr;
-		void(*onUserSyncMessage_wt)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t*, uint16_t& returnDataSize, uint8_t*& returnData, uint16_t sessionId , uint16_t credit, uint16_t time) = nullptr;
+		void(*onUserMessage_rental)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data, uint16_t sessionId, uint16_t credit, uint16_t time) = nullptr;
+		void(*onUserSyncMessage_rental)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t*, uint16_t& returnDataSize, uint8_t*& returnData, uint16_t sessionId , uint16_t credit, uint16_t time) = nullptr;
 
 		void sendSyncResponseMessage(uint64_t messageId, uint16_t dataSize, uint8_t* data);
 
