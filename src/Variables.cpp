@@ -24,12 +24,12 @@ void Variables::onChangeVariableMessage(uint8_t *payload) {
 
 
 	DEBUG_REMOTEME("[RMM] Change variables by direct conenction \n");
-	onChangePropagateMessage(senderDeviceId, receiverDeviceId, pos, payload,0,0,0);
+	onChangePropagateMessage(senderDeviceId, receiverDeviceId, pos, payload,0,0,0,0);
 }
 
 
 
-void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t receiverDeviceId, uint16_t pos, uint8_t *payload, uint16_t sessionId, uint16_t credit, uint16_t time) {
+void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t receiverDeviceId, uint16_t pos, uint8_t *payload, uint16_t sessionId,uint16_t  identificator, uint16_t credit, uint16_t time) {
 	uint16_t count = RemoteMeMessagesUtils::getUint16(payload, pos);
 	DEBUG_REMOTEME("[RMM] Change variables count %d \n", count);
 	while (count != 0) {
@@ -48,7 +48,7 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 						(*it).toCall(value);
 					}
 					if ((*it).toCall_rental != nullptr) {
-						(*it).toCall_rental(value, sessionId,credit,time);
+						(*it).toCall_rental(value, sessionId, identificator, credit,time);
 					}
 					break;
 				}
@@ -63,7 +63,7 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 						(*it).toCall(value);
 					}
 					if ((*it).toCall_rental != nullptr) {
-						(*it).toCall_rental(value, sessionId, credit, time);
+						(*it).toCall_rental(value, sessionId, identificator,  credit, time);
 					}
 					break;
 				}
@@ -78,7 +78,7 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 						(*it).toCall(value);
 					}
 					if ((*it).toCall_rental != nullptr) {
-						(*it).toCall_rental(value, sessionId, credit, time);
+						(*it).toCall_rental(value, sessionId, identificator, credit, time);
 					}
 					break;
 				}
@@ -95,7 +95,7 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 						(*it).toCall(val1, val2, val3);
 					}
 					if ((*it).toCall_rental != nullptr) {
-						(*it).toCall_rental(val1, val2, val3, sessionId, credit, time);
+						(*it).toCall_rental(val1, val2, val3, sessionId, identificator, credit, time);
 					}
 					break;
 				}
@@ -112,7 +112,7 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 						(*it).toCall(val1, val2);
 					}
 					if ((*it).toCall_rental != nullptr) {
-						(*it).toCall_rental(val1, val2, sessionId, credit, time);
+						(*it).toCall_rental(val1, val2, sessionId, identificator, credit, time);
 					}
 					break;
 				}
@@ -129,7 +129,7 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 						(*it).toCall(value, b);
 					}
 					if ((*it).toCall_rental != nullptr) {
-						(*it).toCall_rental(value, b, sessionId, credit, time);
+						(*it).toCall_rental(value, b, sessionId, identificator, credit, time);
 					}
 					break;
 				}
@@ -144,7 +144,7 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 						(*it).toCall(value);
 					}
 					if ((*it).toCall_rental != nullptr) {
-						(*it).toCall_rental(value, sessionId, credit, time);
+						(*it).toCall_rental(value, sessionId, identificator, credit, time);
 					}
 					break;
 				}
@@ -159,7 +159,7 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 						(*it).toCall(value1, value2);
 					}
 					if ((*it).toCall_rental != nullptr) {
-						(*it).toCall_rental(value1, value2, sessionId, credit, time);
+						(*it).toCall_rental(value1, value2, sessionId, identificator, credit, time);
 					}
 					break;
 				}
@@ -179,7 +179,7 @@ void Variables::onChangePropagateMessage(uint16_t senderDeviceId, uint16_t recei
 						(*it).toCall(val1, val2, val3, val4);
 					}
 					if ((*it).toCall_rental != nullptr) {
-						(*it).toCall_rental(val1, val2, val3, val4, sessionId, credit, time);
+						(*it).toCall_rental(val1, val2, val3, val4, sessionId, identificator, credit, time);
 					}
 					break;
 				}
@@ -197,7 +197,7 @@ void Variables::onChangePropagateMessage(uint8_t *payload) {
 	uint16_t senderDeviceId = RemoteMeMessagesUtils::getUint16(payload, pos);
 	uint16_t receiverDeviceId = RemoteMeMessagesUtils::getUint16(payload, pos);
 
-	onChangePropagateMessage(senderDeviceId, receiverDeviceId, pos, payload,0,0,0);
+	onChangePropagateMessage(senderDeviceId, receiverDeviceId, pos, payload,0,0,0,0);
 }
 
 void Variables::onChangePropagateMessage_rental(uint8_t *payload) {
@@ -208,11 +208,12 @@ void Variables::onChangePropagateMessage_rental(uint8_t *payload) {
 	uint16_t receiverDeviceId = RemoteMeMessagesUtils::getUint16(payload, pos);
 
 	uint16_t sessionId = RemoteMeMessagesUtils::getUint16(payload, pos);
+	uint16_t identificator = RemoteMeMessagesUtils::getUint16(payload, pos);
 	uint16_t credit = RemoteMeMessagesUtils::getUint16(payload, pos);
 	uint16_t time = RemoteMeMessagesUtils::getUint16(payload, pos);
 
 
-	onChangePropagateMessage(senderDeviceId, receiverDeviceId, pos, payload, sessionId, credit, time);
+	onChangePropagateMessage(senderDeviceId, receiverDeviceId, pos, payload, sessionId, identificator, credit, time);
 }
 
 
@@ -420,14 +421,14 @@ void Variables::observeSmallInteger2Text2(String name, void(*toCall)(int16_t, in
 }
 //-----------WB version
 
-void Variables::observeBoolean(String name, void(*toCall)(boolean, uint16_t, uint16_t, uint16_t)) {
+void Variables::observeBoolean(String name, void(*toCall)(boolean, uint16_t, uint16_t,uint16_t, uint16_t)) {
 	BooleanVariable bo;
 	bo.toCall_rental = toCall;
 	bo.name = name;
 	this->booleanVariables.push_back(bo);
 }
 
-void Variables::observeInteger(String name, void(*toCall)(int32_t, uint16_t, uint16_t, uint16_t)) {
+void Variables::observeInteger(String name, void(*toCall)(int32_t,uint16_t, uint16_t, uint16_t, uint16_t)) {
 	IntegerVariable bo;
 	bo.toCall_rental = toCall;
 	bo.name = name;
@@ -436,7 +437,7 @@ void Variables::observeInteger(String name, void(*toCall)(int32_t, uint16_t, uin
 }
 
 
-void Variables::observeText(String name, void(*toCall)(String, uint16_t, uint16_t, uint16_t)) {
+void Variables::observeText(String name, void(*toCall)(String, uint16_t, uint16_t,uint16_t, uint16_t)) {
 	TextVariable bo;
 	bo.toCall_rental = toCall;
 	bo.name = name;
@@ -444,35 +445,35 @@ void Variables::observeText(String name, void(*toCall)(String, uint16_t, uint16_
 
 }
 
-void Variables::observeText2(String name, void(*toCall)(String, String, uint16_t, uint16_t, uint16_t)) {
+void Variables::observeText2(String name, void(*toCall)(String, String, uint16_t,uint16_t, uint16_t, uint16_t)) {
 	Text2Variable bo;
 	bo.toCall_rental = toCall;
 	bo.name = name;
 	this->text2Variables.push_back(bo);
 
 }
-void Variables::observeSmallInteger3(String name, void(*toCall)(int16_t, int16_t, int16_t, uint16_t, uint16_t, uint16_t)) {
+void Variables::observeSmallInteger3(String name, void(*toCall)(int16_t, int16_t, int16_t,uint16_t, uint16_t, uint16_t, uint16_t)) {
 	SmallInteger3Variable bo;
 	bo.toCall_rental = toCall;
 	bo.name = name;
 	this->smallInteger3Variables.push_back(bo);
 
 }
-void Variables::observeSmallInteger2(String name, void(*toCall)(int16_t, int16_t, uint16_t, uint16_t, uint16_t)) {
+void Variables::observeSmallInteger2(String name, void(*toCall)(int16_t, int16_t, uint16_t, uint16_t, uint16_t,uint16_t)) {
 	SmallInteger2Variable bo;
 	bo.toCall_rental = toCall;
 	bo.name = name;
 	this->smallInteger2Variables.push_back(bo);
 
 }
-void Variables::observeIntegerBoolean(String name, void(*toCall)(int32_t, boolean, uint16_t, uint16_t, uint16_t)) {
+void Variables::observeIntegerBoolean(String name, void(*toCall)(int32_t, boolean, uint16_t, uint16_t,uint16_t, uint16_t)) {
 	IntegerBooleanVariable bo;
 	bo.toCall_rental = toCall;
 	bo.name = name;
 	this->integerBooleanVariables.push_back(bo);
 
 }
-void Variables::observeDouble(String name, void(*toCall)(double, uint16_t, uint16_t, uint16_t)) {
+void Variables::observeDouble(String name, void(*toCall)(double, uint16_t, uint16_t,uint16_t, uint16_t)) {
 	DoubleVariable bo;
 	bo.toCall_rental = toCall;
 	bo.name = name;
@@ -480,7 +481,7 @@ void Variables::observeDouble(String name, void(*toCall)(double, uint16_t, uint1
 
 }
 
-void Variables::observeSmallInteger2Text2(String name, void(*toCall)(int16_t, int16_t, String, String, uint16_t, uint16_t, uint16_t)) {
+void Variables::observeSmallInteger2Text2(String name, void(*toCall)(int16_t, int16_t, String, String, uint16_t,uint16_t, uint16_t, uint16_t)) {
 	SmallInteger2Text2Variable bo;
 	bo.toCall_rental = toCall;
 	bo.name = name;

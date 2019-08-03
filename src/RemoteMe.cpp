@@ -34,7 +34,7 @@ void RemoteMe::processMessage(uint8_t *payload) {
 
 		uint16_t dataSize = size - pos + 4;// -4 2 for suze 2 for bytes becasuse size is without this
 		uint8_t* data = RemoteMeMessagesUtils::getArray(payload, pos, dataSize);
-		processUserMessage(senderDeviceId, dataSize, data, 0, 0, 0);
+		processUserMessage(senderDeviceId, dataSize, data, 0,0, 0, 0);
 		free(data);
 	}
 	else if (messageType == RemotemeStructures::USER_MESSAGE_WEBPAGE_TOKEN) {
@@ -43,12 +43,13 @@ void RemoteMe::processMessage(uint8_t *payload) {
 		uint16_t senderDeviceId = RemoteMeMessagesUtils::getUint16(payload, pos);
 
 		uint16_t sessionId = RemoteMeMessagesUtils::getUint16(payload, pos);
+		uint16_t identificator = RemoteMeMessagesUtils::getUint16(payload, pos);
 		uint16_t credit = RemoteMeMessagesUtils::getUint16(payload, pos);
 		uint16_t time = RemoteMeMessagesUtils::getUint16(payload, pos);
 
 		uint16_t dataSize = size - pos + 4;// -4 2 for suze 2 for bytes becasuse size is without this
 		uint8_t* data = RemoteMeMessagesUtils::getArray(payload, pos, dataSize);
-		processUserMessage(senderDeviceId, dataSize, data, sessionId, credit, time);
+		processUserMessage(senderDeviceId, dataSize, data, sessionId, identificator, credit, time);
 		free(data);
 	}
 	else if (messageType == RemotemeStructures::USER_SYNC_MESSAGE) {
@@ -61,7 +62,7 @@ void RemoteMe::processMessage(uint8_t *payload) {
 		uint8_t* data = RemoteMeMessagesUtils::getArray(payload, pos, dataSize);
 
 
-		processSyncUserMessage(senderDeviceId, dataSize, data, 0, 0, 0);
+		processSyncUserMessage(senderDeviceId, dataSize, data,0, 0, 0, 0);
 
 		free(data);
 
@@ -71,6 +72,7 @@ void RemoteMe::processMessage(uint8_t *payload) {
 		uint16_t senderDeviceId = RemoteMeMessagesUtils::getUint16(payload, pos);
 
 		uint16_t sessionId = RemoteMeMessagesUtils::getUint16(payload, pos);
+		uint16_t identificator = RemoteMeMessagesUtils::getUint16(payload, pos);
 		uint16_t credit = RemoteMeMessagesUtils::getUint16(payload, pos);
 		uint16_t time = RemoteMeMessagesUtils::getUint16(payload, pos);
 
@@ -80,7 +82,7 @@ void RemoteMe::processMessage(uint8_t *payload) {
 		uint8_t* data = RemoteMeMessagesUtils::getArray(payload, pos, dataSize);
 
 
-		processSyncUserMessage(senderDeviceId, dataSize, data, sessionId, credit, time);
+		processSyncUserMessage(senderDeviceId, dataSize, data, sessionId,identificator, credit, time);
 
 		free(data);
 
@@ -150,22 +152,22 @@ void RemoteMe::processMessage(uint8_t *payload) {
 	}
 }
 
-void RemoteMe::processUserMessage(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data, uint16_t sessionId, uint16_t credit, uint16_t time) {
+void RemoteMe::processUserMessage(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data, uint16_t sessionId,uint16_t identificator, uint16_t credit, uint16_t time) {
 
 	if (onUserMessage != nullptr) {
 		onUserMessage(senderDeviceId, dataSize, data);
 	}
 	if (onUserMessage_rental != nullptr) {
-		onUserMessage_rental(senderDeviceId, dataSize, data, sessionId, credit, time);
+		onUserMessage_rental(senderDeviceId, dataSize, data, sessionId, identificator, credit, time);
 	}
 }
-void RemoteMe::processSyncUserMessage(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data, uint16_t sessionId, uint16_t credit, uint16_t time) {
+void RemoteMe::processSyncUserMessage(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data, uint16_t sessionId,uint16_t identificator, uint16_t credit, uint16_t time) {
 	if (onUserSyncMessage != nullptr || onUserSyncMessage_rental != nullptr) {
 		uint16_t returnDataSize;
 		uint8_t* returnData;
 
 		if (onUserSyncMessage_rental != nullptr) {
-			onUserSyncMessage_rental(senderDeviceId, dataSize, data, returnDataSize, returnData, sessionId, credit, time);
+			onUserSyncMessage_rental(senderDeviceId, dataSize, data, returnDataSize, returnData, sessionId, identificator, credit, time);
 		}
 		else {
 			onUserSyncMessage(senderDeviceId, dataSize, data, returnDataSize, returnData);
@@ -390,7 +392,7 @@ void RemoteMe::setUserMessageListener(void(*onUserMessage)(uint16_t senderDevice
 	this->onUserMessage = onUserMessage;
 }
 
-void RemoteMe::setUserMessageListener(void(*onUserMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t *data, uint16_t sessionId, uint16_t credit, uint16_t time))
+void RemoteMe::setUserMessageListener(void(*onUserMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t *data, uint16_t sessionId,uint16_t identificator, uint16_t credit, uint16_t time))
 {
 	this->onUserMessage_rental = onUserMessage;
 }
@@ -400,7 +402,7 @@ void RemoteMe::setUserSyncMessageListener(void(*onUserSyncMessage)(uint16_t send
 	this->onUserSyncMessage = onUserSyncMessage;
 }
 
-void RemoteMe::setUserSyncMessageListener(void(*onUserSyncMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t *, uint16_t &returnDataSize, uint8_t *&returnData, uint16_t sessionId, uint16_t credit, uint16_t time))
+void RemoteMe::setUserSyncMessageListener(void(*onUserSyncMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t *, uint16_t &returnDataSize, uint8_t *&returnData, uint16_t sessionId,uint16_t identificator, uint16_t credit, uint16_t time))
 {
 	this->onUserSyncMessage_rental = onUserSyncMessage;
 }
@@ -457,7 +459,7 @@ void RemoteMe::sendVariableObserveMessage() {
 
 }
 
-void RemoteMe::sendDecreaseWebPageTokenCreditMessage(uint16_t sessionId, int16_t credit, int16_t time) {
+void RemoteMe::sendDecreaseWebPageTokenCreditMessage(uint16_t sessionId , int16_t credit, int16_t time) {
 	DEBUG_REMOTEME("[RMM] sendDecreaseWebPageTokenCreditMessage \n");
 	uint16_t size = 12;
 	uint8_t* payload = (uint8_t*)malloc(size);

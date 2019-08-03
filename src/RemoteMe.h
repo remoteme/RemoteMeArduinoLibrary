@@ -61,8 +61,8 @@
 		void(*onUserSyncMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t*, uint16_t& returnDataSize, uint8_t*& returnData ) = nullptr;
 		
 		
-		void(*onUserMessage_rental)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data, uint16_t sessionId, uint16_t credit, uint16_t time) = nullptr;
-		void(*onUserSyncMessage_rental)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t*, uint16_t& returnDataSize, uint8_t*& returnData, uint16_t sessionId , uint16_t credit, uint16_t time) = nullptr;
+		void(*onUserMessage_rental)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data, uint16_t sessionId,uint16_t identificator, uint16_t credit, uint16_t time) = nullptr;
+		void(*onUserSyncMessage_rental)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t*, uint16_t& returnDataSize, uint8_t*& returnData, uint16_t sessionId , uint16_t identificator, uint16_t credit, uint16_t time) = nullptr;
 
 		void sendSyncResponseMessage(uint64_t messageId, uint16_t dataSize, uint8_t* data);
 
@@ -76,8 +76,8 @@
 		bool sendDirect(uint16_t receiverDeviceId, uint8_t *payload, uint16_t length);
 		void sendDirect(uint8_t *payload, uint16_t length);
 		void send(uint8_t * payload, uint16_t size);
-		void processUserMessage(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data, uint16_t sessionId, uint16_t credit, uint16_t time);
-		void processSyncUserMessage(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data, uint16_t sessionId, uint16_t credit, uint16_t time);
+		void processUserMessage(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data, uint16_t sessionId,uint16_t identificator, uint16_t credit, uint16_t time);
+		void processSyncUserMessage(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data, uint16_t sessionId,uint16_t identificator, uint16_t credit, uint16_t time);
 
 	public:
 		static RemoteMe& getInstance(char * token, int deviceId)
@@ -110,7 +110,7 @@
 		void sendUserMessage(uint16_t receiverDeviceId, String message);
 		void sendUserMessage(uint16_t receiverDeviceId, const uint8_t * payload, uint16_t length);
 
-		void sendDecreaseWebPageTokenCreditMessage(uint16_t sessionId, int16_t credit, int16_t time);
+		void sendDecreaseWebPageTokenCreditMessage(uint16_t sessionId , int16_t credit, int16_t time);
 
 		void sendRegisterDeviceMessage(uint16_t deviceId, String deviceName, RemotemeStructures::DeviceType deviceType, RemotemeStructures::NetworkDeviceType networkDeviceType);
 		void sendRegisterDeviceMessage(String deviceName);
@@ -131,8 +131,8 @@
 		void setUserMessageListener(void(*onUserMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data));
 		void setUserSyncMessageListener(void(*onUserSyncMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t*, uint16_t& returnDataSize, uint8_t*& returnData));
 
-		void setUserMessageListener(void(*onUserMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data, uint16_t sessionId, uint16_t credit, uint16_t time));
-		void setUserSyncMessageListener(void(*onUserSyncMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t*, uint16_t& returnDataSize, uint8_t*& returnData, uint16_t sessionId, uint16_t credit, uint16_t time));
+		void setUserMessageListener(void(*onUserMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data, uint16_t sessionId,uint16_t identificator, uint16_t credit, uint16_t time));
+		void setUserSyncMessageListener(void(*onUserSyncMessage)(uint16_t senderDeviceId, uint16_t dataSize, uint8_t*, uint16_t& returnDataSize, uint8_t*& returnData, uint16_t sessionId,uint16_t identificator, uint16_t credit, uint16_t time));
 		
 		//------------
 

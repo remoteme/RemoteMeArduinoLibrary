@@ -20,47 +20,47 @@ class RemoteMe;
 
 	struct BooleanVariable {
 		String name;
-		void(*toCall_rental)(boolean, uint16_t, uint16_t, uint16_t)=nullptr;
+		void(*toCall_rental)(boolean, uint16_t, uint16_t,uint16_t, uint16_t)=nullptr;
 		void(*toCall)(boolean) = nullptr;
 	};
 	struct IntegerVariable {
 		String name;
-		void(*toCall_rental)(int32_t, uint16_t, uint16_t, uint16_t) = nullptr;;
+		void(*toCall_rental)(int32_t, uint16_t, uint16_t, uint16_t,uint16_t) = nullptr;;
 		void(*toCall)(int32_t) = nullptr;;
 	};
 	struct TextVariable {
 		String name;
-		void(*toCall_rental)(String, uint16_t, uint16_t, uint16_t) = nullptr;;
+		void(*toCall_rental)(String, uint16_t, uint16_t, uint16_t,uint16_t) = nullptr;;
 		void(*toCall)(String) = nullptr;;
 	};
 	struct SmallInteger3Variable {
 		String name;
-		void(*toCall_rental)(int16_t, int16_t, int16_t, uint16_t, uint16_t, uint16_t) = nullptr;;
+		void(*toCall_rental)(int16_t, int16_t, int16_t, uint16_t, uint16_t, uint16_t,uint16_t) = nullptr;;
 		void(*toCall)(int16_t, int16_t, int16_t) = nullptr;;
 	};
 	struct SmallInteger2Variable {
 		String name;
-		void(*toCall_rental)(int16_t, int16_t, uint16_t, uint16_t, uint16_t) = nullptr;;
+		void(*toCall_rental)(int16_t, int16_t, uint16_t, uint16_t, uint16_t,uint16_t) = nullptr;;
 		void(*toCall)(int16_t, int16_t);
 	};
 	struct IntegerBooleanVariable {
 		String name;
-		void(*toCall_rental)(int32_t, boolean, uint16_t, uint16_t, uint16_t) = nullptr;;
+		void(*toCall_rental)(int32_t, boolean, uint16_t, uint16_t, uint16_t,uint16_t) = nullptr;;
 		void(*toCall)(int32_t, boolean) = nullptr;;
 	};
 	struct DoubleVariable {
 		String name;
-		void(*toCall_rental)(double, uint16_t, uint16_t, uint16_t) = nullptr;;
+		void(*toCall_rental)(double, uint16_t, uint16_t, uint16_t,uint16_t) = nullptr;;
 		void(*toCall)(double);
 	};
 	struct Text2Variable {
 		String name;
-		void(*toCall_rental)(String,String, uint16_t, uint16_t, uint16_t) = nullptr;;
+		void(*toCall_rental)(String,String, uint16_t, uint16_t, uint16_t,uint16_t) = nullptr;;
 		void(*toCall)(String,String) = nullptr;;
 	};
 	struct SmallInteger2Text2Variable {
 		String name;
-		void(*toCall_rental)(int16_t, int16_t,String,String, uint16_t, uint16_t, uint16_t) = nullptr;;
+		void(*toCall_rental)(int16_t, int16_t,String,String, uint16_t, uint16_t,uint16_t, uint16_t) = nullptr;;
 		void(*toCall)(int16_t, int16_t,String,String) = nullptr;;
 	};
 	class Variables
@@ -88,7 +88,7 @@ class RemoteMe;
 		void onChangePropagateMessage_rental(uint8_t *payload);
 
 		void onChangeVariableMessage(uint8_t *payload);
-		void onChangePropagateMessage(uint16_t senderDeviceId,  uint16_t receiverDeviceId, uint16_t pos, uint8_t *payload,uint16_t sessionId, uint16_t credit, uint16_t time);
+		void onChangePropagateMessage(uint16_t senderDeviceId,  uint16_t receiverDeviceId, uint16_t pos, uint8_t *payload,uint16_t sessionId,uint16_t  identificator,  uint16_t credit, uint16_t time);
 		uint16_t getVariableObserveMessage( uint8_t* &payload);
 	
 		void send(uint8_t * payload, uint16_t size);
@@ -106,15 +106,15 @@ class RemoteMe;
 		void observeSmallInteger2Text2(String name, void(*toCall)(int16_t, int16_t,String,String));
 
 
-		void observeBoolean(String name, void(*toCall)(boolean, uint16_t , uint16_t , uint16_t ));
-		void observeInteger(String name, void(*toCall)(int32_t, uint16_t, uint16_t, uint16_t));
-		void observeText(String name, void(*toCall)(String, uint16_t, uint16_t, uint16_t));
-		void observeText2(String name, void(*toCall)(String, String, uint16_t, uint16_t, uint16_t));
-		void observeSmallInteger3(String name, void(*toCall)(int16_t, int16_t, int16_t, uint16_t, uint16_t, uint16_t));
-		void observeSmallInteger2(String name, void(*toCall)(int16_t, int16_t, uint16_t, uint16_t, uint16_t));
-		void observeIntegerBoolean(String name, void(*toCall)(int32_t, boolean, uint16_t, uint16_t, uint16_t));
-		void observeDouble(String name, void(*toCall)(double, uint16_t, uint16_t, uint16_t));
-		void observeSmallInteger2Text2(String name, void(*toCall)(int16_t, int16_t, String, String, uint16_t, uint16_t, uint16_t));
+		void observeBoolean(String name, void(*toCall)(boolean, uint16_t , uint16_t ,uint16_t, uint16_t ));
+		void observeInteger(String name, void(*toCall)(int32_t, uint16_t, uint16_t, uint16_t,uint16_t));
+		void observeText(String name, void(*toCall)(String, uint16_t, uint16_t,uint16_t, uint16_t));
+		void observeText2(String name, void(*toCall)(String, String, uint16_t, uint16_t,uint16_t, uint16_t));
+		void observeSmallInteger3(String name, void(*toCall)(int16_t, int16_t, int16_t, uint16_t,uint16_t, uint16_t, uint16_t));
+		void observeSmallInteger2(String name, void(*toCall)(int16_t, int16_t, uint16_t, uint16_t,uint16_t, uint16_t));
+		void observeIntegerBoolean(String name, void(*toCall)(int32_t, boolean, uint16_t, uint16_t, uint16_t,uint16_t));
+		void observeDouble(String name, void(*toCall)(double, uint16_t, uint16_t, uint16_t,uint16_t));
+		void observeSmallInteger2Text2(String name, void(*toCall)(int16_t, int16_t, String, String, uint16_t,uint16_t, uint16_t, uint16_t));
 
 
 
