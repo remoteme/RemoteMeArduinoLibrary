@@ -459,12 +459,12 @@ void RemoteMe::sendVariableObserveMessage() {
 
 }
 
-void RemoteMe::sendDecreaseWebPageTokenCreditMessage(uint16_t sessionId , int16_t credit, int16_t time) {
-	DEBUG_REMOTEME("[RMM] sendDecreaseWebPageTokenCreditMessage \n");
+void RemoteMe::sendDecreaseGuestKeyCreditAndTimeMessage(uint16_t sessionId , int16_t credit, int16_t time) {
+	DEBUG_REMOTEME("[RMM] sendDecreaseGuestKeyCreditAndTimeMessage \n");
 	uint16_t size = 12;
 	uint8_t* payload = (uint8_t*)malloc(size);
 	uint16_t pos = 0;
-	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::DECREASE_WEBPAGE_TOKEN_CREDIT);
+	RemoteMeMessagesUtils::putUint16(payload, pos, RemotemeStructures::DECREASE_GUEST_CREDIT_AND_TIME);
 	RemoteMeMessagesUtils::putUint16(payload, pos, 8);
 	RemoteMeMessagesUtils::putUint16(payload, pos, deviceId);
 	RemoteMeMessagesUtils::putUint16(payload, pos, sessionId);

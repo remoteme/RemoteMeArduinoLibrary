@@ -110,7 +110,7 @@
 		void sendUserMessage(uint16_t receiverDeviceId, String message);
 		void sendUserMessage(uint16_t receiverDeviceId, const uint8_t * payload, uint16_t length);
 
-		void sendDecreaseWebPageTokenCreditMessage(uint16_t sessionId , int16_t credit, int16_t time);
+		void sendDecreaseGuestKeyCreditAndTimeMessage(uint16_t sessionId , int16_t credit, int16_t time);
 
 		void sendRegisterDeviceMessage(uint16_t deviceId, String deviceName, RemotemeStructures::DeviceType deviceType, RemotemeStructures::NetworkDeviceType networkDeviceType);
 		void sendRegisterDeviceMessage(String deviceName);
