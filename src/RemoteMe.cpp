@@ -407,15 +407,19 @@ void RemoteMe::setUserSyncMessageListener(void(*onUserSyncMessage)(uint16_t send
 	this->onUserSyncMessage_rental = onUserSyncMessage;
 }
 
-void RemoteMe::loop() {
+bool RemoteMe::loop() {
 
-	this->connector->waitForConnection();
-	this->connector->loop();
+	if (this->connector->waitForConnection()){
+		this->connector->loop();
 
-
-	if (remoteMeDirectConnector != nullptr) {
-		remoteMeDirectConnector->loop();
+		if (remoteMeDirectConnector != nullptr) {
+			remoteMeDirectConnector->loop();
+		}
+		return true;
+	}else{
+		return false;
 	}
+	
 
 }
 

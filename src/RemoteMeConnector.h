@@ -30,7 +30,7 @@ class RemoteMeConnector{
 		virtual String getIp() = 0;
 
 		virtual void loop() = 0;
-		virtual void waitForConnection() = 0;
+		virtual bool waitForConnection() = 0;
 		virtual void disconnect() = 0;
 		virtual void send(uint8_t * payload, uint16_t size) = 0;
 		

@@ -126,7 +126,7 @@ class RemoteMeSocketConnector: public RemoteMeConnector
 		bool isSocketConnected();
 		
 		void ping();
-		void waitForConnection();
+		bool waitForConnection();
 	
 		
 		void disconnect();

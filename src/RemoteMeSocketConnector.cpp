@@ -48,7 +48,7 @@ String  RemoteMeSocketConnector::getIp() {
 	}
 
 	
-	void RemoteMeSocketConnector::waitForConnection() {
+	bool RemoteMeSocketConnector::waitForConnection() {
 		static unsigned long lastTimePing = 0;
 
 		if (lastTimePing + PING_SEND < deltaMillis() && isSocketConnected()) {
@@ -61,19 +61,16 @@ String  RemoteMeSocketConnector::getIp() {
 			int continousRestarting = 0;
 				
 			socketConnected = false;
-			while (!isSocketConnected()) {
+			if (!isSocketConnected()) {
+				
+				
 				if (wifiClient != nullptr) {
 					wifiClient->stop();
 					delete wifiClient;
 				}
 				
-				if (continousRestarting>0){
-					delay(100);
-				}
-				continousRestarting++;
-				if (continousRestarting>300){
-					DEBUG_REMOTEME("[RMM] Restarting esp\n");
-					ESP.restart();
+				if (WiFi.status() != WL_CONNECTED){
+					return false;
 				}
 				
 				wifiClient = new WEBSOCKETS_NETWORK_CLASS();
@@ -108,13 +105,17 @@ String  RemoteMeSocketConnector::getIp() {
 					sendVariableObserveMessage();
 					
 					DEBUG_REMOTEME("[RMM] connected\n");
+					return true;
 					
 				}
 				else {
 					DEBUG_REMOTEME("[RMM]not connected\n");
+					return false;
 				}
 			}
 	
+		}else{
+			return true;
 		}
 		
 		

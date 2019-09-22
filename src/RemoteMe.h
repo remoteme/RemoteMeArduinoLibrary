@@ -96,7 +96,7 @@
 		void setDirectConnector(RemoteMeDirectConnector* remoteMeDirectConnector);
 		inline const char* getToken() { return token; }
 
-		void loop();
+		bool loop();
 		void disconnect();
 		
 		uint16_t getDeviceId();
