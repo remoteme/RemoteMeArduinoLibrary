@@ -75,7 +75,7 @@
 		std::list<uint16_t>* getDirectConnected();
 		bool sendDirect(uint16_t receiverDeviceId, uint8_t *payload, uint16_t length);
 		void sendDirect(uint8_t *payload, uint16_t length);
-		void send(uint8_t * payload, uint16_t size);
+		
 		void processUserMessage(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data, uint16_t sessionId,uint16_t identificator, uint16_t credit, uint16_t time);
 		void processSyncUserMessage(uint16_t senderDeviceId, uint16_t dataSize, uint8_t* data, uint16_t sessionId,uint16_t identificator, uint16_t credit, uint16_t time);
 
@@ -91,6 +91,8 @@
 		RemoteMe(RemoteMe const&) = delete;
 		void operator=(RemoteMe const&) = delete;
 
+
+		void send(uint8_t * payload, uint16_t size);
 		
 		void setConnector(RemoteMeConnector* remoteMeConnector);
 		void setDirectConnector(RemoteMeDirectConnector* remoteMeDirectConnector);
